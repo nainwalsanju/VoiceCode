@@ -1,6 +1,6 @@
 # VoiceCode - Project State
 
-**Status:** Phase 1: Foundation  
+**Status:** Phase 2: Core Voice I/O
 **Last Updated:** 2026-02-23
 
 ## Project
@@ -11,13 +11,19 @@
 
 ## Current Phase
 
-**Phase 1: Foundation** - Initializing project infrastructure
+**Phase 2: Core Voice I/O** - Voice dictation and TTS integration
 
-## Progress
+## Completed Phases
 
 | Phase | Status | Plans |
 |-------|--------|-------|
-| 1: Foundation | ◆ In Progress | 0/3 |
+| 1: Foundation | ✓ Complete | 3/3 |
+
+## Current Progress
+
+| Phase | Status | Plans |
+|-------|--------|-------|
+| 1: Foundation | ✓ | 3/3 |
 | 2: Core Voice I/O | ○ | 0/4 |
 | 3: Voice Cloning | ○ | 0/4 |
 | 4: Voice Commands | ○ | 0/4 |
@@ -25,7 +31,7 @@
 
 ## Current Plan
 
-**01-01:** Initialize Tauri + React Project
+**02-01:** Integrate Pocket TTS (first in phase 2)
 
 ## Milestones
 
