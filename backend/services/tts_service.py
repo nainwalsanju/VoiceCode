@@ -1,7 +1,7 @@
 import io
 import base64
 import structlog
-from typing import Optional
+from typing import Optional, AsyncGenerator
 import asyncio
 import edge_tts
 
@@ -13,14 +13,10 @@ AVAILABLE_VOICES = {
         "en-US-GuyNeural",
         "en-US-JennyNeural",
         "en-US-SaraNeural",
-        "en-US-AriaMultilingualNeural",
-        "en-US-GuyMultilingualNeural",
-        "en-US-JennyMultilingualNeural",
     ],
     "en-GB": [
         "en-GB-SoniaNeural",
         "en-GB-RyanNeural",
-        "en-GB-LibbyNeural",
     ],
     "es-ES": [
         "es-ES-ElviraNeural",
@@ -34,19 +30,12 @@ AVAILABLE_VOICES = {
         "de-DE-KatjaNeural",
         "de-DE-ConradNeural",
     ],
-    "it-IT": [
-        "it-IT-ElsaNeural",
-        "it-IT-DiegoNeural",
-    ],
-    "pt-BR": [
-        "pt-BR-FranciscaNeural",
-        "pt-BR-AntonioNeural",
-    ],
 }
 
 DEFAULT_VOICE = "en-US-AriaNeural"
 DEFAULT_RATE = "+0%"
 DEFAULT_PITCH = "+0Hz"
+CHUNK_SIZE = 4096
 
 
 class TTSService:
@@ -79,6 +68,24 @@ class TTSService:
             "audio_generated", size_bytes=len(audio_bytes), duration_ms=duration_ms
         )
         return audio_bytes, duration_ms
+
+    async def stream_audio_async(
+        self,
+        text: str,
+        voice: str = DEFAULT_VOICE,
+        rate: str = DEFAULT_RATE,
+        pitch: str = DEFAULT_PITCH,
+    ) -> AsyncGenerator[bytes, None]:
+        if not text or not text.strip():
+            raise ValueError("Text cannot be empty")
+
+        logger.info("streaming_audio", text_length=len(text), voice=voice)
+
+        communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
+
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                yield chunk["data"]
 
     def generate_audio(
         self, text: str, voice: str = DEFAULT_VOICE, speed: float = 1.0
