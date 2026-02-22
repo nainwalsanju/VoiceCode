@@ -1,0 +1,138 @@
+.dictation-display {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 600px;
+}
+
+.dictation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dictation-header h3 {
+  margin: 0;
+  color: #e0e0e0;
+  font-size: 16px;
+}
+
+.dictation-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  background: #333;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.action-btn:hover {
+  background: #444;
+}
+
+.action-btn.clear-btn {
+  color: #ff6b6b;
+}
+
+.dictation-content {
+  background: #2a2a2a;
+  border-radius: 6px;
+  padding: 16px;
+  min-height: 120px;
+}
+
+.dictation-content.recording {
+  border: 1px solid #4caf50;
+}
+
+.dictation-content .placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+.dictation-content p {
+  margin: 0;
+  color: #e0e0e0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: #4caf50;
+  font-size: 14px;
+}
+
+.recording-dot {
+  width: 8px;
+  height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.edit-mode textarea {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 12px;
+  color: #e0e0e0;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.edit-mode textarea:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.save-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #45a049;
+}
+
+.cancel-btn {
+  background: #333;
+  color: #ccc;
+}
+
+.cancel-btn:hover {
+  background: #444;
+}

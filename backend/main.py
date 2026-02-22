@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import structlog
 import sys
 import uuid
@@ -9,7 +10,7 @@ from contextlib import asynccontextmanager
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from backend.routes import tts, stt
+from backend.routes import tts, stt, stt_stream
 from backend.utils.logging import setup_logging
 from backend.exceptions import (
     VoiceCodeException,
@@ -31,10 +32,16 @@ app = FastAPI(title="VoiceCode Backend", lifespan=lifespan)
 
 app.include_router(tts.router)
 app.include_router(stt.router)
+app.include_router(stt_stream.router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:1420", "http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:1420",
+        "http://localhost:3000",
+        "ws://localhost:3000",
+        "ws://localhost:8000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
