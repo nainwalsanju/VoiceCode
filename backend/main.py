@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from backend.routes import tts, stt, stt_stream, voice_profiles, voice
+from backend.routes import tts, stt, stt_stream, voice_profiles, voice, commands
 from backend.utils.logging import setup_logging
 from backend.exceptions import (
     VoiceCodeException,
@@ -35,6 +35,7 @@ app.include_router(stt.router)
 app.include_router(stt_stream.router)
 app.include_router(voice_profiles.router)
 app.include_router(voice.router)
+app.include_router(commands.router)
 
 app.add_middleware(
     CORSMiddleware,

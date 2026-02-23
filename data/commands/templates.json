@@ -1,0 +1,131 @@
+[
+  {
+    "id": "template-1",
+    "name": "Insert Email Signature",
+    "trigger": "insert signature",
+    "action_type": "insert_text",
+    "action_data": {
+      "text": "Best regards,\n{{name}}\n{{title}}"
+    },
+    "description": "Insert a personalized email signature",
+    "category": "text"
+  },
+  {
+    "id": "template-2",
+    "name": "Insert Current Date",
+    "trigger": "insert date",
+    "action_type": "insert_text",
+    "action_data": {
+      "text": "{{date}}"
+    },
+    "description": "Insert today's date",
+    "category": "text"
+  },
+  {
+    "id": "template-3",
+    "name": "Run Git Status",
+    "trigger": "git status",
+    "action_type": "run_command",
+    "action_data": {
+      "command": "git status",
+      "shell": true,
+      "timeout": 10
+    },
+    "description": "Show git status in terminal",
+    "category": "development"
+  },
+  {
+    "id": "template-4",
+    "name": "Run Git Commit",
+    "trigger": "git commit",
+    "action_type": "run_command",
+    "action_data": {
+      "command": "git commit -m \"{{message}}\"",
+      "shell": true,
+      "timeout": 30
+    },
+    "description": "Create a git commit with message",
+    "category": "development"
+  },
+  {
+    "id": "template-5",
+    "name": "Save File",
+    "trigger": "save file",
+    "action_type": "hotkey",
+    "action_data": {
+      "keys": ["s"],
+      "modifiers": ["command"]
+    },
+    "description": "Save current file (Cmd+S)",
+    "category": "hotkey"
+  },
+  {
+    "id": "template-6",
+    "name": "Undo",
+    "trigger": "undo that",
+    "action_type": "hotkey",
+    "action_data": {
+      "keys": ["z"],
+      "modifiers": ["command"]
+    },
+    "description": "Undo last action (Cmd+Z)",
+    "category": "hotkey"
+  },
+  {
+    "id": "template-7",
+    "name": "Code Block",
+    "trigger": "code block",
+    "action_type": "snippet",
+    "action_data": {
+      "template": "```{{language}}\n{{code}}\n```",
+      "variables": {
+        "language": "javascript",
+        "code": "// code here"
+      }
+    },
+    "description": "Insert a code block",
+    "category": "snippets"
+  },
+  {
+    "id": "template-8",
+    "name": "Console Log",
+    "trigger": "log this",
+    "action_type": "snippet",
+    "action_data": {
+      "template": "console.log('{{message}}', {{variable}});",
+      "variables": {
+        "message": "Debug",
+        "variable": "value"
+      }
+    },
+    "description": "Insert a console.log statement",
+    "category": "snippets"
+  },
+  {
+    "id": "template-9",
+    "name": "React Component",
+    "trigger": "react component",
+    "action_type": "snippet",
+    "action_data": {
+      "template": "import React from 'react';\n\ninterface {{name}}Props {\n  \n}\n\nexport function {{name}}({}: {{name}}Props) {\n  return (\n    <div>\n      \n    </div>\n  );\n}",
+      "variables": {
+        "name": "MyComponent"
+      }
+    },
+    "description": "Insert a React component template",
+    "category": "snippets"
+  },
+  {
+    "id": "template-10",
+    "name": "Find in Files",
+    "trigger": "find in files",
+    "action_type": "run_command",
+    "action_data": {
+      "command": "rg \"{{query}}\" --hidden",
+      "shell": true,
+      "timeout": 30
+    },
+    "description": "Search for text in all files",
+    "category": "development"
+  }
+]
