@@ -1,0 +1,15 @@
+{
+  "stt_provider": "google",
+  "tts_voice": "en-US-Neural2-F",
+  "tts_speed": 1.0,
+  "tts_pitch": 1.0,
+  "microphone": "",
+  "hotkey": "Ctrl+Shift+V",
+  "auto_start": false,
+  "tts_enabled": true,
+  "minimize_to_tray": true,
+  "always_on_top": false,
+  "language": "en-US",
+  "silence_threshold": 0.5,
+  "max_recording_duration": 30
+}

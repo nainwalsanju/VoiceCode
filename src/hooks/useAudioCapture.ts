@@ -49,7 +49,7 @@ export function useAudioCapture(options: AudioCaptureOptions = {}) {
         }
       };
 
-      mediaRecorder.onerror = (event) => {
+      mediaRecorder.onerror = () => {
         const err = new Error('MediaRecorder error');
         setError(err);
         if (options.onError) {

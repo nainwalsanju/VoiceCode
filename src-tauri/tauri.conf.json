@@ -12,9 +12,17 @@
   "app": {
     "windows": [
       {
-        "title": "voicecode",
-        "width": 800,
-        "height": 600
+        "title": "VoiceCode",
+        "width": 900,
+        "height": 700,
+        "minWidth": 600,
+        "minHeight": 400,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "visible": true,
+        "focus": true
       }
     ],
     "security": {

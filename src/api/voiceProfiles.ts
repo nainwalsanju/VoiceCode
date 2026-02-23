@@ -23,7 +23,7 @@ export const voiceProfilesApi = {
   },
 
   delete: async (id: string): Promise<void> => {
-    await apiClient.post(`/voice-profiles/${id}`, { method: 'DELETE' });
+    await apiClient.delete(`/voice-profiles/${id}`);
   },
 
   clone: async (name: string, audioFile: File): Promise<VoiceCloneResponse> => {

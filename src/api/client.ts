@@ -49,6 +49,17 @@ class ApiClient {
     });
   }
 
+  async delete<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint, { method: 'DELETE' });
+  }
+
+  async put<T>(endpoint: string, data: unknown): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
   async healthCheck(): Promise<{ status: string; service: string }> {
     return this.get<{ status: string; service: string }>('/health');
   }

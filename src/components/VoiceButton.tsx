@@ -8,14 +8,12 @@ interface VoiceButtonProps {
 
 export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonProps) {
   const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [websocket, setWebsocket] = useState<WebSocket | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
-  const processingRef = useRef(false);
 
   const startRecording = useCallback(async () => {
     try {
@@ -71,13 +69,9 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
         const data = JSON.parse(event.data);
         
         if (data.type === 'transcription' && data.text) {
-          setTranscript(prev => {
-            const newText = prev + ' ' + data.text;
-            if (onTranscript) {
-              onTranscript(newText.trim());
-            }
-            return newText.trim();
-          });
+          if (onTranscript) {
+            onTranscript(data.text.trim());
+          }
         }
       };
       

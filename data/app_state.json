@@ -1,0 +1,16 @@
+{
+  "last_voice_profile_id": null,
+  "last_tts_voice": null,
+  "window_position": {
+    "x": null,
+    "y": null
+  },
+  "window_size": {
+    "width": null,
+    "height": null
+  },
+  "active_command_ids": [],
+  "recent_commands": [],
+  "started_at": "2026-02-23T08:38:56.761691",
+  "last_session_at": null
+}

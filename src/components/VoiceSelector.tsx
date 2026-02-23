@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { VoiceProfile } from '../types/voiceProfile';
 import { voiceProfilesApi } from '../api/voiceProfiles';
 
 interface Voice {
