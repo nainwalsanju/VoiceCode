@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "id": "8088011e-4c48-46ba-aa9f-bb7822eec684",
+    "trigger": "test cmd",
+    "action_type": "insert_text",
+    "action_data": {
+      "text": "Hello"
+    },
+    "description": "",
+    "is_active": true,
+    "is_regex": false,
+    "priority": 0,
+    "created_at": "2026-02-23T09:37:19.526743",
+    "updated_at": "2026-02-23T09:37:19.526785"
+  },
+  {
+    "id": "bd26e22d-0e5c-415e-9501-db10fbbcc090",
+    "trigger": "test e2e",
+    "action_type": "insert_text",
+    "action_data": {
+      "text": "Hello E2E"
+    },
+    "description": "",
+    "is_active": true,
+    "is_regex": false,
+    "priority": 0,
+    "created_at": "2026-02-23T09:39:31.192699",
+    "updated_at": "2026-02-23T09:39:31.192703"
+  }
+]

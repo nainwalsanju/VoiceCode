@@ -18,7 +18,6 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { isConnected, isLoading } = useBackendStatus();
   
-  // Use store for dictation
   const { text, isRecording, appendText } = useDictationStore();
   
   const handleTranscript = (newText: string) => {
@@ -26,135 +25,166 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-slate-900 text-slate-50">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-800">
-        <h1 className="text-xl font-bold text-indigo-400">VoiceCode</h1>
-        
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Sidebar */}
+      <aside className="w-64 bg-slate-800/50 backdrop-blur-xl border-r border-slate-700/50 flex flex-col">
+        {/* Logo */}
+        <div className="p-4 border-b border-slate-700/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                VoiceCode
+              </h1>
+              <p className="text-xs text-slate-500">Voice Coding App</p>
+            </div>
+          </div>
+        </div>
+
         {/* Navigation */}
-        <nav className="flex gap-2">
+        <nav className="flex-1 p-3 space-y-2">
           {[
-            { id: "dictate", label: "Dictate", icon: "🎤" },
-            { id: "voices", label: "Voices", icon: "🎭" },
-            { id: "commands", label: "Commands", icon: "⚡" },
-            { id: "test", label: "Test", icon: "🧪" },
+            { id: "dictate" as View, label: "Dictate", icon: "🎤", desc: "Voice dictation" },
+            { id: "voices" as View, label: "Voices", icon: "🎭", desc: "Voice profiles" },
+            { id: "commands" as View, label: "Commands", icon: "⚡", desc: "Voice commands" },
+            { id: "test" as View, label: "Test", icon: "🧪", desc: "Test commands" },
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setCurrentView(item.id as View)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              onClick={() => setCurrentView(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                 currentView === item.id
-                  ? "bg-indigo-600 text-white"
-                  : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                  ? "bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 border border-indigo-500/30"
+                  : "text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 border border-transparent"
               }`}
             >
-              <span className="mr-2">{item.icon}</span>
-              {item.label}
+              <span>{item.icon}</span>
+              <div className="text-left">
+                <div className="font-medium">{item.label}</div>
+                <div className="text-xs text-slate-500">{item.desc}</div>
+              </div>
             </button>
           ))}
         </nav>
+      </aside>
 
-        <div className="flex items-center gap-4">
-          {/* Voice Selector */}
-          <VoiceSelector />
-          
-          {/* Settings */}
-          <button
-            onClick={() => setSettingsOpen(true)}
-            className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-            title="Settings"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
-          
-          {/* Backend Status */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">Backend:</span>
-            {isLoading ? (
-              <span className="text-slate-400">Checking...</span>
-            ) : isConnected ? (
-              <span className="flex items-center gap-1 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                Connected
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-red-400">
-                <span className="w-2 h-2 rounded-full bg-red-400"></span>
-                Disconnected
-              </span>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="px-6 py-4 border-b border-slate-700/50 bg-slate-800/30 backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white">
+                {currentView === "dictate" && "Voice Dictation"}
+                {currentView === "voices" && "Voice Profiles"}
+                {currentView === "commands" && "Voice Commands"}
+                {currentView === "test" && "Test Commands"}
+              </h2>
+              <p className="text-sm text-slate-400">
+                {currentView === "dictate" && "Speak and your words will appear here"}
+                {currentView === "voices" && "Manage your cloned voices"}
+                {currentView === "commands" && "Create and manage voice commands"}
+                {currentView === "test" && "Test your voice commands"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <VoiceSelector />
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-600 transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+              <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                {isLoading ? (
+                  <span className="text-sm text-slate-400">Checking...</span>
+                ) : isConnected ? (
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-sm text-emerald-400">Connected</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span className="text-sm text-red-400">Disconnected</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto p-6">
+          <div className="max-w-5xl mx-auto">
+            {currentView === "dictate" && (
+              <div className="space-y-6">
+                <div className="flex justify-center py-8">
+                  <VoiceButton onTranscript={handleTranscript} />
+                </div>
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+                  <DictationDisplay 
+                    text={text} 
+                    onTextChange={(newText) => useDictationStore.getState().setText(newText)}
+                    isRecording={isRecording}
+                  />
+                </div>
+              </div>
+            )}
+
+            {currentView === "voices" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-semibold mb-4">Your Voices</h3>
+                  <VoiceProfileList />
+                </div>
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-semibold mb-4">Clone New Voice</h3>
+                  <VoiceCloneForm />
+                </div>
+              </div>
+            )}
+
+            {currentView === "commands" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-semibold mb-4">Your Commands</h3>
+                  <CommandList />
+                </div>
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-semibold mb-4">Create Command</h3>
+                  <CommandForm />
+                </div>
+              </div>
+            )}
+
+            {currentView === "test" && (
+              <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+                <h3 className="text-lg font-semibold mb-4">Test Commands</h3>
+                <CommandTester />
+              </div>
             )}
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        {currentView === "dictate" && (
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Voice Dictation</h2>
-            
-            {/* Voice Button */}
-            <div className="flex justify-center mb-8">
-              <VoiceButton onTranscript={handleTranscript} />
-            </div>
-            
-            {/* Dictation Display */}
-            <DictationDisplay 
-              text={text} 
-              onTextChange={(newText) => useDictationStore.getState().setText(newText)}
-              isRecording={isRecording}
-            />
+        <footer className="px-6 py-3 border-t border-slate-700/50 bg-slate-800/30">
+          <div className="flex items-center justify-between text-sm text-slate-500">
+            <span>VoiceCode v0.1.0</span>
+            <span>Powered by Edge TTS & Faster Whisper</span>
           </div>
-        )}
+        </footer>
+      </main>
 
-        {currentView === "voices" && (
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Voice Profiles</h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Your Voices</h3>
-                <VoiceProfileList />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Clone New Voice</h3>
-                <VoiceCloneForm />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentView === "commands" && (
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Voice Commands</h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Your Commands</h3>
-                <CommandList />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Create Command</h3>
-                <CommandForm />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentView === "test" && (
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Test Commands</h2>
-            <CommandTester />
-          </div>
-        )}
-      </div>
-
-      {/* Settings Modal */}
       <SettingsPanel isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
-    </main>
+    </div>
   );
 }
 

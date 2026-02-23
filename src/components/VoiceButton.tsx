@@ -9,17 +9,20 @@ interface VoiceButtonProps {
 export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  const [status, setStatus] = useState<'idle' | 'connecting' | 'ready' | 'recording' | 'error'>('idle');
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const startRecording = useCallback(async () => {
     try {
       setError(null);
+      setStatus('connecting');
       audioChunksRef.current = [];
 
+      // Step 1: Get microphone access
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -27,70 +30,108 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
           sampleRate: 16000,
         }
       });
-      
       streamRef.current = stream;
 
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = async (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-          
-          if (websocket && websocket.readyState === WebSocket.OPEN) {
-            const arrayBuffer = await event.data.arrayBuffer();
-            const base64 = btoa(
-              new Uint8Array(arrayBuffer)
-                .reduce((data, byte) => data + String.fromCharCode(byte), '')
-            );
-            
-            websocket.send(JSON.stringify({
-              type: 'audio',
-              data: base64
-            }));
-          }
-        }
-      };
-
-      mediaRecorder.start(500);
-      setIsRecording(true);
-
+      // Step 2: Create WebSocket first
       const ws = new WebSocket('ws://localhost:8000/stt/stream');
       
       ws.onopen = () => {
         console.log('WebSocket connected');
-        setWebsocket(ws);
+        setStatus('ready');
+        wsRef.current = ws;
       };
       
       ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === 'transcription' && data.text) {
-          if (onTranscript) {
-            onTranscript(data.text.trim());
+        try {
+          const data = JSON.parse(event.data);
+          console.log('WS message:', data);
+          
+          if (data.type === 'ready') {
+            setStatus('recording');
+            // Start recording after WS is ready
+            startMediaRecording();
+          } else if (data.type === 'transcription' && data.text) {
+            if (onTranscript) {
+              onTranscript(data.text.trim());
+            }
           }
+        } catch (e) {
+          console.error('Parse error:', e);
         }
       };
       
       ws.onerror = (err) => {
         console.error('WebSocket error:', err);
         setError('Connection error');
+        setStatus('error');
       };
       
       ws.onclose = () => {
         console.log('WebSocket closed');
-        setWebsocket(null);
+        wsRef.current = null;
+        if (isRecording) {
+          setStatus('idle');
+        }
       };
+
+      // Wait for WebSocket to connect before proceeding
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('WebSocket timeout')), 10000);
+        ws.onopen = () => {
+          clearTimeout(timeout);
+          console.log('WebSocket connected');
+          setStatus('ready');
+          wsRef.current = ws;
+          resolve();
+        };
+        ws.onerror = (err) => {
+          clearTimeout(timeout);
+          console.error('WebSocket error:', err);
+          reject(err);
+        };
+      });
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to start recording';
       setError(errorMessage);
+      setStatus('error');
       console.error('Recording error:', err);
     }
-  }, [websocket, onTranscript]);
+  }, [onTranscript]);
+
+  const startMediaRecording = () => {
+    if (!streamRef.current) return;
+    
+    const mediaRecorder = new MediaRecorder(streamRef.current, {
+      mimeType: 'audio/webm;codecs=opus'
+    });
+    
+    mediaRecorderRef.current = mediaRecorder;
+
+    mediaRecorder.ondataavailable = async (event) => {
+      if (event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+        
+        const ws = wsRef.current;
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          const arrayBuffer = await event.data.arrayBuffer();
+          const base64 = btoa(
+            new Uint8Array(arrayBuffer)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+          
+          ws.send(JSON.stringify({
+            type: 'audio',
+            data: base64
+          }));
+        }
+      }
+    };
+
+    mediaRecorder.start(500);
+    setIsRecording(true);
+    setStatus('recording');
+  };
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -102,13 +143,14 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       streamRef.current = null;
     }
     
-    if (websocket) {
-      websocket.close();
-      setWebsocket(null);
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
     }
     
     setIsRecording(false);
-  }, [websocket]);
+    setStatus('idle');
+  }, []);
 
   const toggleRecording = () => {
     if (isRecording) {
@@ -126,23 +168,35 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
-      if (websocket) {
-        websocket.close();
+      if (wsRef.current) {
+        wsRef.current.close();
       }
     };
   }, []);
 
+  const statusColors: Record<string, string> = {
+    idle: '',
+    connecting: 'connecting',
+    ready: 'ready',
+    recording: 'recording',
+    error: 'error'
+  };
+
   return (
     <div className="voice-button-container">
       <button 
-        className={`voice-button ${isRecording ? 'recording' : ''} ${error ? 'error' : ''}`}
+        className={`voice-button ${statusColors[status]} ${error ? 'error' : ''}`}
         onClick={toggleRecording}
-        disabled={isProcessing}
+        disabled={isProcessing || status === 'connecting'}
       >
         <span className="mic-icon">
-          {isRecording ? (
+          {status === 'recording' ? (
             <svg viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="6" width="12" height="12" rx="2" />
+            </svg>
+          ) : status === 'connecting' ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="spin">
+              <circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20" />
             </svg>
           ) : (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -155,8 +209,13 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
         </span>
       </button>
       
-      {isRecording && <span className="recording-label">Listening...</span>}
-      {error && <span className="error-label">{error}</span>}
+      <div className="status-info">
+        {status === 'idle' && <span className="status-label">Click to start</span>}
+        {status === 'connecting' && <span className="status-label">Connecting...</span>}
+        {status === 'ready' && <span className="status-label">Ready</span>}
+        {status === 'recording' && <span className="status-label recording-label">Listening...</span>}
+        {status === 'error' && <span className="error-label">{error || 'Error'}</span>}
+      </div>
     </div>
   );
 }

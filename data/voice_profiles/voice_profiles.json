@@ -1,0 +1,10 @@
+[
+  {
+    "id": "bdd68c46-2fd2-4647-8d93-83b9f7564890",
+    "name": "Sanjay",
+    "voice_id": "0d23368b-19e0-4905-8cdc-622d191efee8",
+    "is_default": false,
+    "created_at": "2026-02-23T09:17:45.903344",
+    "audio_sample_path": "/Users/sanju/Projects/voicecode/data/audio_samples/0d23368b-19e0-4905-8cdc-622d191efee8.wav"
+  }
+]

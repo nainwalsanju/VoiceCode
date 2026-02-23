@@ -47,6 +47,63 @@ class CommandResponse(BaseModel):
     updated_at: str
 
 
+# IMPORTANT: /templates must come BEFORE /{command_id} to avoid route conflict
+@router.get("/templates")
+async def get_templates():
+    """Get available command templates."""
+    if not TEMPLATES_FILE.exists():
+        return []
+
+    try:
+        templates = json.loads(TEMPLATES_FILE.read_text())
+        return templates
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to load templates: {str(e)}"
+        )
+
+
+class ExecuteRequest(BaseModel):
+    text: str
+
+
+class ExecuteResponse(BaseModel):
+    matched: bool
+    command_id: Optional[str] = None
+    trigger: Optional[str] = None
+    action_type: Optional[str] = None
+    success: bool
+    output: Optional[dict] = None
+    error: Optional[str] = None
+
+
+@router.post("/execute")
+async def execute_command(request: ExecuteRequest):
+    """Execute a command based on transcribed text."""
+    store = get_voice_command_store()
+    executor = get_command_executor()
+
+    command = store.find_matching(request.text)
+    if not command:
+        return ExecuteResponse(
+            matched=False,
+            success=False,
+            error="No matching command found",
+        )
+
+    result = executor.execute(command.action_type, command.action_data)
+
+    return ExecuteResponse(
+        matched=True,
+        command_id=command.id,
+        trigger=command.trigger,
+        action_type=command.action_type,
+        success=result.success,
+        output=result.output,
+        error=result.error,
+    )
+
+
 @router.get("")
 async def list_commands():
     """List all voice commands."""
@@ -63,6 +120,7 @@ async def list_active_commands():
     return [c.to_dict() for c in commands]
 
 
+# IMPORTANT: /{command_id} must come AFTER more specific routes
 @router.get("/{command_id}")
 async def get_command(command_id: str):
     """Get a specific command by ID."""
@@ -128,59 +186,3 @@ async def toggle_command(command_id: str):
 
     updated = store.update(command_id, is_active=not command.is_active)
     return updated.to_dict()
-
-
-class ExecuteRequest(BaseModel):
-    text: str
-
-
-class ExecuteResponse(BaseModel):
-    matched: bool
-    command_id: Optional[str] = None
-    trigger: Optional[str] = None
-    action_type: Optional[str] = None
-    success: bool
-    output: Optional[dict] = None
-    error: Optional[str] = None
-
-
-@router.post("/execute")
-async def execute_command(request: ExecuteRequest):
-    """Execute a command based on transcribed text."""
-    store = get_voice_command_store()
-    executor = get_command_executor()
-
-    command = store.find_matching(request.text)
-    if not command:
-        return ExecuteResponse(
-            matched=False,
-            success=False,
-            error="No matching command found",
-        )
-
-    result = executor.execute(command.action_type, command.action_data)
-
-    return ExecuteResponse(
-        matched=True,
-        command_id=command.id,
-        trigger=command.trigger,
-        action_type=command.action_type,
-        success=result.success,
-        output=result.output,
-        error=result.error,
-    )
-
-
-@router.get("/templates")
-async def get_templates():
-    """Get available command templates."""
-    if not TEMPLATES_FILE.exists():
-        return []
-
-    try:
-        templates = json.loads(TEMPLATES_FILE.read_text())
-        return templates
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to load templates: {str(e)}"
-        )
