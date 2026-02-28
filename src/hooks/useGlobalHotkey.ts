@@ -8,6 +8,12 @@ export interface HotkeyConfig {
 let registeredHotkey: string | null = null;
 
 export async function registerGlobalHotkey(key: string, callback: () => void): Promise<boolean> {
+  // Prevent crashing when running in a standard Vite web browser session (non-Tauri)
+  if (!(window as any).__TAURI__) {
+    console.warn('Global shortcuts are only supported in the Tauri desktop app.');
+    return false;
+  }
+
   try {
     if (registeredHotkey) {
       await unregisterGlobalHotkey(registeredHotkey);

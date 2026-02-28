@@ -9,188 +9,202 @@ interface VoiceButtonProps {
 export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<'idle' | 'connecting' | 'ready' | 'recording' | 'error'>('idle');
-  
+  const [status, setStatus] = useState<'idle' | 'connecting' | 'listening' | 'speaking' | 'error'>('idle');
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
 
-  const startRecording = useCallback(async () => {
+  // Audio playback context for streaming TTS bytes
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const nextPlayTimeRef = useRef<number>(0);
+
+  const initAudioContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
+        sampleRate: 16000
+      });
+    }
+    if (audioContextRef.current.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
+  };
+
+  const playAudioChunk = async (pcmData: number[]) => {
+    const ctx = audioContextRef.current;
+    if (!ctx) return;
+
+    // Convert generic byte list back to Float32Array
+    const float32Data = new Float32Array(pcmData.length);
+    for (let i = 0; i < pcmData.length; i++) {
+      // Assuming simple 16-bit PCM conversion for this simulation snippet
+      float32Data[i] = (pcmData[i] - 128) / 128.0;
+    }
+
+    const buffer = ctx.createBuffer(1, float32Data.length, 16000);
+    buffer.getChannelData(0).set(float32Data);
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+
+    const currentTime = ctx.currentTime;
+    // Schedule seamlessly
+    const playTime = Math.max(currentTime, nextPlayTimeRef.current);
+    source.start(playTime);
+    nextPlayTimeRef.current = playTime + buffer.duration;
+  };
+
+  const startInteraction = useCallback(async () => {
     try {
       setError(null);
       setStatus('connecting');
-      audioChunksRef.current = [];
+      initAudioContext();
+      nextPlayTimeRef.current = 0;
 
-      // Step 1: Get microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 16000,
-        }
-      });
-      streamRef.current = stream;
+      // 1: Connect WebSocket to unified Agent Stream
+      const ws = new WebSocket('ws://localhost:8000/agent/stream');
 
-      // Step 2: Create WebSocket first
-      const ws = new WebSocket('ws://localhost:8000/stt/stream');
-      
       ws.onopen = () => {
-        console.log('WebSocket connected');
-        setStatus('ready');
+        console.log('Agent WebSocket connected');
         wsRef.current = ws;
       };
-      
-      ws.onmessage = (event) => {
+
+      ws.onmessage = async (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log('WS message:', data);
-          
+          console.log("WS Data Payload:", data.type, data.text ? data.text : (data.data ? `[data array size: ${data.data.length}]` : ""));
+
           if (data.type === 'ready') {
-            setStatus('recording');
-            // Start recording after WS is ready
-            startMediaRecording();
+            startMediaRecording(ws);
           } else if (data.type === 'transcription' && data.text) {
-            if (onTranscript) {
-              onTranscript(data.text.trim());
+            if (onTranscript) onTranscript(data.text.trim());
+          } else if (data.type === 'tts_start') {
+            setStatus('speaking');
+          } else if (data.type === 'tts_audio' && data.data) {
+            // Feed streaming TTS chunks to AudioContext instantly
+            let pcmData = data.data;
+            if (typeof data.data === 'string') {
+              const bin = window.atob(data.data);
+              pcmData = new Array(bin.length);
+              for (let i = 0; i < bin.length; i++) {
+                pcmData[i] = bin.charCodeAt(i);
+              }
             }
+            await playAudioChunk(pcmData);
+          } else if (data.type === 'tts_end') {
+            setStatus('idle');
           }
         } catch (e) {
-          console.error('Parse error:', e);
+          console.error('WS Parse error:', e);
         }
       };
-      
+
       ws.onerror = (err) => {
-        console.error('WebSocket error:', err);
+        console.error('Agent WS error:', err);
         setError('Connection error');
         setStatus('error');
       };
-      
+
       ws.onclose = () => {
-        console.log('WebSocket closed');
+        console.log('Agent WS closed');
         wsRef.current = null;
-        if (isRecording) {
-          setStatus('idle');
-        }
+        if (isRecording) stopInteraction();
       };
-
-      // Wait for WebSocket to connect before proceeding
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('WebSocket timeout')), 10000);
-        ws.onopen = () => {
-          clearTimeout(timeout);
-          console.log('WebSocket connected');
-          setStatus('ready');
-          wsRef.current = ws;
-          resolve();
-        };
-        ws.onerror = (err) => {
-          clearTimeout(timeout);
-          console.error('WebSocket error:', err);
-          reject(err);
-        };
-      });
-
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start recording';
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : 'Failed to start');
       setStatus('error');
-      console.error('Recording error:', err);
     }
   }, [onTranscript]);
 
-  const startMediaRecording = () => {
-    if (!streamRef.current) return;
-    
-    const mediaRecorder = new MediaRecorder(streamRef.current, {
-      mimeType: 'audio/webm;codecs=opus'
-    });
-    
-    mediaRecorderRef.current = mediaRecorder;
+  const startMediaRecording = async (ws: WebSocket) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 16000 }
+      });
+      streamRef.current = stream;
 
-    mediaRecorder.ondataavailable = async (event) => {
-      if (event.data.size > 0) {
-        audioChunksRef.current.push(event.data);
-        
-        const ws = wsRef.current;
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          const arrayBuffer = await event.data.arrayBuffer();
-          const base64 = btoa(
-            new Uint8Array(arrayBuffer)
-              .reduce((data, byte) => data + String.fromCharCode(byte), '')
-          );
-          
-          ws.send(JSON.stringify({
-            type: 'audio',
-            data: base64
-          }));
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+          const reader = new FileReader();
+          reader.readAsDataURL(event.data);
+          reader.onloadend = () => {
+            const base64Data = (reader.result as string).split(',')[1];
+            ws.send(JSON.stringify({ type: 'audio', data: base64Data }));
+          };
         }
-      }
-    };
+      };
 
-    mediaRecorder.start(500);
-    setIsRecording(true);
-    setStatus('recording');
+      // Aggressive chunking for ultra-low latency (250ms)
+      mediaRecorder.start(250);
+      setIsRecording(true);
+      setStatus('listening');
+    } catch (err) {
+      setError('Mic access denied');
+      setStatus('error');
+    }
   };
 
-  const stopRecording = useCallback(() => {
+  const finishListening = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
     }
-    
+
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-    
+
+    setIsRecording(false);
+    setStatus('connecting'); // Show spinner while Agent thinks
+
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'audio_end' }));
+    }
+  }, []);
+
+  const closeConnection = useCallback(() => {
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
     }
-    
-    setIsRecording(false);
+    if (audioContextRef.current) {
+      audioContextRef.current.suspend();
+    }
     setStatus('idle');
   }, []);
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
+  const stopInteraction = useCallback(() => {
+    finishListening();
+    closeConnection();
+  }, [finishListening, closeConnection]);
+
+  const toggleRecording = () => isRecording ? finishListening() : startInteraction();
 
   useEffect(() => {
     return () => {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-      }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
+      stopInteraction();
     };
-  }, []);
-
-  const statusColors: Record<string, string> = {
-    idle: '',
-    connecting: 'connecting',
-    ready: 'ready',
-    recording: 'recording',
-    error: 'error'
-  };
+  }, [stopInteraction]);
 
   return (
     <div className="voice-button-container">
-      <button 
-        className={`voice-button ${statusColors[status]} ${error ? 'error' : ''}`}
+      <button
+        className={`voice-button ${status} ${error ? 'error' : ''}`}
         onClick={toggleRecording}
         disabled={isProcessing || status === 'connecting'}
       >
         <span className="mic-icon">
-          {status === 'recording' ? (
+          {status === 'speaking' ? (
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              {/* Speaker Icon indicating Agent is talking */}
+              <path d="M11 5L6 9H2v6h4l5 4V5z" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          ) : status === 'listening' ? (
             <svg viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="6" width="12" height="12" rx="2" />
             </svg>
@@ -200,20 +214,20 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
             </svg>
           ) : (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-              <line x1="12" y1="19" x2="12" y2="23"/>
-              <line x1="8" y1="23" x2="16" y2="23"/>
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
             </svg>
           )}
         </span>
       </button>
-      
+
       <div className="status-info">
-        {status === 'idle' && <span className="status-label">Click to start</span>}
-        {status === 'connecting' && <span className="status-label">Connecting...</span>}
-        {status === 'ready' && <span className="status-label">Ready</span>}
-        {status === 'recording' && <span className="status-label recording-label">Listening...</span>}
+        {status === 'idle' && <span className="status-label">Click to Start Flow</span>}
+        {status === 'connecting' && <span className="status-label">Connecting S2S...</span>}
+        {status === 'listening' && <span className="status-label recording-label">Listening...</span>}
+        {status === 'speaking' && <span className="status-label speaking-label">Agent is Speaking...</span>}
         {status === 'error' && <span className="error-label">{error || 'Error'}</span>}
       </div>
     </div>

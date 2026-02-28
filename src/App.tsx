@@ -17,11 +17,12 @@ function App() {
   const [currentView, setCurrentView] = useState<View>("dictate");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { isConnected, isLoading } = useBackendStatus();
-  
+
   const { text, isRecording, appendText } = useDictationStore();
-  
+
   const handleTranscript = (newText: string) => {
-    appendText(newText);
+    // The STT backend streams cumulative text over the single session, so we overwrite the state.
+    useDictationStore.getState().setText(newText);
   };
 
   return (
@@ -56,11 +57,10 @@ function App() {
             <button
               key={item.id}
               onClick={() => setCurrentView(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                currentView === item.id
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentView === item.id
                   ? "bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 border border-indigo-500/30"
                   : "text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 border border-transparent"
-              }`}
+                }`}
             >
               <span>{item.icon}</span>
               <div className="text-left">
@@ -131,8 +131,8 @@ function App() {
                   <VoiceButton onTranscript={handleTranscript} />
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
-                  <DictationDisplay 
-                    text={text} 
+                  <DictationDisplay
+                    text={text}
                     onTextChange={(newText) => useDictationStore.getState().setText(newText)}
                     isRecording={isRecording}
                   />
