@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import './VoiceButton.css';
+import { useSessionStore, SessionState } from '../stores/sessionStore';
+import { useTranscriptStore } from '../stores/transcriptStore';
 
 interface VoiceButtonProps {
   onTranscript?: (text: string) => void;
@@ -9,7 +10,34 @@ interface VoiceButtonProps {
 export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<'idle' | 'connecting' | 'listening' | 'speaking' | 'error'>('idle');
+  const [wsSessionState, setWsSessionState] = useState<SessionState>('IDLE');
+  const [isConnecting, setIsConnecting] = useState(false);
+  
+  // Use session store for state management
+  const { 
+    currentState,
+    setState,
+    startListening,
+    startProcessing,
+    startSpeaking,
+    endSpeaking,
+    isContinuousMode
+  } = useSessionStore();
+  
+  // Add messages to transcript store
+  const addMessage = useTranscriptStore((state) => state.addMessage);
+  
+  // Derive display status from session store and WebSocket state
+  // Priority: error > connecting > recording > wsSessionState > currentState
+  const status: 'idle' | 'connecting' | 'listening' | 'speaking' | 'error' = 
+    error ? 'error' :
+    isConnecting ? 'connecting' :
+    isRecording ? 'listening' :
+    wsSessionState === 'PROCESSING' ? 'listening' : // Show as listening during processing for UX
+    wsSessionState === 'SPEAKING' ? 'speaking' :
+    currentState === 'SPEAKING' ? 'speaking' :
+    currentState === 'LISTENING' || currentState === 'PROCESSING' ? 'listening' :
+    'idle';
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -55,12 +83,29 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
     nextPlayTimeRef.current = playTime + buffer.duration;
   };
 
+  // Handle WebSocket state messages from backend
+  const handleStateMessage = useCallback((state: SessionState) => {
+    setWsSessionState(state);
+    if (state === 'LISTENING') {
+      startListening();
+    } else if (state === 'PROCESSING') {
+      startProcessing();
+    } else if (state === 'SPEAKING') {
+      startSpeaking();
+    } else if (state === 'IDLE') {
+      endSpeaking();
+    }
+  }, [startListening, startProcessing, startSpeaking, endSpeaking]);
+
   const startInteraction = useCallback(async () => {
     try {
       setError(null);
-      setStatus('connecting');
+      setIsConnecting(true);
       initAudioContext();
       nextPlayTimeRef.current = 0;
+
+      // Connect to session store
+      startListening();
 
       // 1: Connect WebSocket to unified Agent Stream
       const ws = new WebSocket('ws://localhost:8000/agent/stream');
@@ -68,6 +113,7 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       ws.onopen = () => {
         console.log('Agent WebSocket connected');
         wsRef.current = ws;
+        setIsConnecting(false);
       };
 
       ws.onmessage = async (event) => {
@@ -78,9 +124,25 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
           if (data.type === 'ready') {
             startMediaRecording(ws);
           } else if (data.type === 'transcription' && data.text) {
-            if (onTranscript) onTranscript(data.text.trim());
+            const text = data.text.trim();
+            if (onTranscript) onTranscript(text);
+            // Add to transcript store
+            addMessage('user', text);
+          } else if (data.type === 'state' && data.state) {
+            // Handle state messages from backend
+            const stateMap: Record<string, SessionState> = {
+              'listening': 'LISTENING',
+              'processing': 'PROCESSING',
+              'speaking': 'SPEAKING',
+              'idle': 'IDLE'
+            };
+            const sessionState = stateMap[data.state];
+            if (sessionState) {
+              handleStateMessage(sessionState);
+            }
           } else if (data.type === 'tts_start') {
-            setStatus('speaking');
+            setWsSessionState('SPEAKING');
+            startSpeaking();
           } else if (data.type === 'tts_audio' && data.data) {
             // Feed streaming TTS chunks to AudioContext instantly
             let pcmData = data.data;
@@ -93,7 +155,16 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
             }
             await playAudioChunk(pcmData);
           } else if (data.type === 'tts_end') {
-            setStatus('idle');
+            setWsSessionState('IDLE');
+            endSpeaking();
+          } else if (data.type === 'llm_start') {
+            // LLM started processing - show as processing
+            startProcessing();
+          } else if (data.type === 'llm_end') {
+            // LLM finished - ready for TTS
+          } else if (data.type === 'sentence_start' && data.text) {
+            // Add assistant message to transcript
+            addMessage('assistant', data.text);
           }
         } catch (e) {
           console.error('WS Parse error:', e);
@@ -103,19 +174,22 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       ws.onerror = (err) => {
         console.error('Agent WS error:', err);
         setError('Connection error');
-        setStatus('error');
+        setWsSessionState('IDLE');
+        setState('IDLE');
       };
 
       ws.onclose = () => {
         console.log('Agent WS closed');
         wsRef.current = null;
+        setWsSessionState('IDLE');
         if (isRecording) stopInteraction();
       };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start');
-      setStatus('error');
+      setWsSessionState('IDLE');
+      setState('IDLE');
     }
-  }, [onTranscript]);
+  }, [onTranscript, addMessage, handleStateMessage, startListening, startProcessing, startSpeaking, endSpeaking, setState, isRecording]);
 
   const startMediaRecording = async (ws: WebSocket) => {
     try {
@@ -141,10 +215,11 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       // Aggressive chunking for ultra-low latency (250ms)
       mediaRecorder.start(250);
       setIsRecording(true);
-      setStatus('listening');
+      startListening();
     } catch (err) {
       setError('Mic access denied');
-      setStatus('error');
+      setWsSessionState('IDLE');
+      setState('IDLE');
     }
   };
 
@@ -159,7 +234,7 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
     }
 
     setIsRecording(false);
-    setStatus('connecting'); // Show spinner while Agent thinks
+    setIsConnecting(true); // Show spinner while Agent processes
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: 'audio_end' }));
@@ -174,13 +249,15 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
     if (audioContextRef.current) {
       audioContextRef.current.suspend();
     }
-    setStatus('idle');
+    setWsSessionState('IDLE');
+    setIsConnecting(false);
   }, []);
 
   const stopInteraction = useCallback(() => {
     finishListening();
     closeConnection();
-  }, [finishListening, closeConnection]);
+    setState('IDLE');
+  }, [finishListening, closeConnection, setState]);
 
   const toggleRecording = () => isRecording ? finishListening() : startInteraction();
 
@@ -190,45 +267,111 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
     };
   }, [stopInteraction]);
 
-  return (
-    <div className="voice-button-container">
-      <button
-        className={`voice-button ${status} ${error ? 'error' : ''}`}
-        onClick={toggleRecording}
-        disabled={isProcessing || status === 'connecting'}
-      >
-        <span className="mic-icon">
-          {status === 'speaking' ? (
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              {/* Speaker Icon indicating Agent is talking */}
-              <path d="M11 5L6 9H2v6h4l5 4V5z" />
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          ) : status === 'listening' ? (
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="6" width="12" height="12" rx="2" />
-            </svg>
-          ) : status === 'connecting' ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="spin">
-              <circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              <line x1="12" y1="19" x2="12" y2="23" />
-              <line x1="8" y1="23" x2="16" y2="23" />
-            </svg>
-          )}
-        </span>
-      </button>
+  // Get state label based on current state
+  const getStateLabel = () => {
+    if (error) return error || 'Core Failure';
+    if (isConnecting) return 'Establishing Link...';
+    if (isRecording) return 'Capturing Neural Input';
+    if (wsSessionState === 'PROCESSING' || currentState === 'PROCESSING') return 'Processing...';
+    if (wsSessionState === 'SPEAKING' || currentState === 'SPEAKING') return 'Synthesizing Response';
+    return 'System Ready / Idle';
+  };
 
-      <div className="status-info">
-        {status === 'idle' && <span className="status-label">Click to Start Flow</span>}
-        {status === 'connecting' && <span className="status-label">Connecting S2S...</span>}
-        {status === 'listening' && <span className="status-label recording-label">Listening...</span>}
-        {status === 'speaking' && <span className="status-label speaking-label">Agent is Speaking...</span>}
-        {status === 'error' && <span className="error-label">{error || 'Error'}</span>}
+  // Get CSS class for state label
+  const getStateLabelClass = () => {
+    if (error) return 'text-error font-bold';
+    if (isConnecting || isRecording || wsSessionState === 'PROCESSING') return 'text-secondary animate-pulse';
+    if (wsSessionState === 'SPEAKING' || currentState === 'SPEAKING') return 'text-accent animate-pulse';
+    return 'text-text-secondary opacity-60';
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-8">
+      <div className="relative group">
+        {/* Outer Glow Layer */}
+        <div className={`absolute -inset-4 rounded-full blur-2xl transition-opacity duration-1000 ${status === 'listening' ? 'bg-secondary/30 opacity-100' :
+            status === 'speaking' ? 'bg-accent/20 opacity-100' : 'opacity-0'
+          }`}></div>
+
+        <button
+          className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer isolation-auto z-10
+            ${status === 'listening' ? 'bg-secondary ring-4 ring-secondary/30 shadow-[0_0_50px_rgba(139,92,246,0.6)] scale-110' :
+              status === 'speaking' ? 'bg-accent shadow-[0_0_40px_rgba(16,185,129,0.5)] animate-pulse' :
+                status === 'error' ? 'bg-error shadow-[0_0_30px_rgba(239,68,68,0.5)]' :
+                  'bg-surface border-2 border-border hover:border-primary/50 hover:shadow-neon'}
+            ${isProcessing || status === 'connecting' ? 'opacity-50 cursor-wait' : ''}
+          `}
+          onClick={toggleRecording}
+          disabled={isProcessing || status === 'connecting'}
+        >
+          {/* Animated Spectral Rings for Listening */}
+          {status === 'listening' && (
+            <div className="absolute inset-0 z-0">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute inset-0 rounded-full border-2 border-secondary/30 animate-ping"
+                  style={{ animationDelay: `${i * 400}ms`, animationDuration: '2s' }}
+                ></div>
+              ))}
+            </div>
+          )}
+
+          {/* Core Icon */}
+          <span className={`relative z-10 transition-all duration-500 group-hover:scale-110 ${status === 'listening' ? 'text-white' : 'text-text-primary'}`}>
+            {status === 'speaking' ? (
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            ) : status === 'listening' ? (
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12">
+                <rect x="7" y="7" width="10" height="10" rx="1.5" />
+              </svg>
+            ) : status === 'connecting' ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-12 h-12 animate-spin opacity-50">
+                <circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-12 h-12">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+              </svg>
+            )}
+          </span>
+        </button>
+
+        {/* Visualizer Bars (Overlay when listening) */}
+        {status === 'listening' && (
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1 h-8 z-20">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="w-1 bg-white/80 rounded-full animate-pulse"
+                style={{
+                  height: `${20 + Math.random() * 80}%`,
+                  animationDelay: `${i * 100}ms`,
+                  animationDuration: `${0.5 + Math.random()}s`
+                }}
+              ></div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col items-center">
+        <span className={`text-sm font-mono tracking-widest uppercase ${getStateLabelClass()}`}>
+          {getStateLabel()}
+        </span>
+        
+        {/* Continuous mode indicator */}
+        {isContinuousMode && status !== 'idle' && !error && (
+          <span className="text-xs text-text-secondary mt-1 opacity-50">
+            Continuous Mode Active
+          </span>
+        )}
       </div>
     </div>
   );
