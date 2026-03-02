@@ -67,7 +67,7 @@ Each task was committed atomically:
 2. **Task 2: Implement Sentence Buffer for Streaming** - `be65f91` (feat)
 3. **Task 3: Integrate LLM with Agent Stream** - (completed in Task 2)
 
-**Plan metadata:** (pending final commit)
+**Plan metadata:** `d733f5e` (docs: complete plan)
 
 ## Files Created/Modified
 - `backend/services/llm_service.py` - NVIDIA API LLM client with streaming
