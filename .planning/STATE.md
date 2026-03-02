@@ -1,12 +1,12 @@
 # VoiceCode State
 
-**Last updated:** 2026-03-02T18:25:00Z
+**Last updated:** 2026-03-02T19:06:00Z
 
 ## Project Reference
 
 **Core Value:** Users can have natural, real-time voice conversations with an AI assistant, with the ability to customize the assistant's voice by cloning any person's voice.
 
-**Current Focus:** Phase 1: Core Audio Pipeline
+**Current Focus:** Phase 2: Full Conversation Pipeline
 
 ---
 
@@ -14,10 +14,10 @@
 
 | Attribute | Value |
 |-----------|-------|
-| **Phase** | 1 - Core Audio Pipeline |
-| **Plan** | Core Audio Pipeline |
+| **Phase** | 2 - Full Conversation Pipeline |
+| **Plan** | 02-02 |
 | **Status** | Completed |
-| **Progress** | 100% |
+| **Progress** | 67% (2/3 plans) |
 
 ---
 
@@ -26,7 +26,7 @@
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
 | 1 | Core Audio Pipeline | 3/3 | ✅ Complete | 11 tasks |
-| 2 | Full Conversation Pipeline | 1/3 | In Progress | - |
+| 2 | Full Conversation Pipeline | 2/3 | In Progress | - |
 | 3 | Conversation Flow & Voice Features | 0/3 | Not started | - |
 | 4 | Polish & Desktop Integration | 0/2 | Not started | - |
 
@@ -57,6 +57,9 @@
 | Configurable turn endpointing | 500ms silence default, adaptive threshold | ✅ Implemented |
 | Natural speech handling | Filler word removal, turn completion | ✅ Implemented |
 | Tauri for desktop | Existing src-tauri, Rust backend | ✅ Verified |
+| NVIDIA NIM for LLM | OpenAI-compatible API, streaming support | ✅ Implemented |
+| Sentence-by-sentence streaming | Natural TTS flow, faster than full response | ✅ Implemented |
+| httpx for async HTTP | Lighter than OpenAI SDK | ✅ Implemented |
 
 ### Technical Notes
 
@@ -74,13 +77,14 @@
 
 ## Session Continuity
 
-**Ready for:** Phase 2: Full Conversation Pipeline
+**Ready for:** Phase 2: Full Conversation Pipeline - Plan 03
 
 **Next steps:**
 1. ✅ Complete Phase 1 (Core Audio Pipeline) - DONE
-2. Plan Phase 2 (Full Conversation Pipeline)
-3. Execute Phase 2 plans
-4. Validate full conversation loop
+2. ✅ Complete Phase 2 Plan 01 (Voice Selection & Transcript UI) - DONE
+3. ✅ Complete Phase 2 Plan 02 (NVIDIA LLM Integration) - DONE
+4. Execute Phase 2 Plan 03 (Voice Cloning UI)
+5. Validate full conversation loop
 
 ---
 
