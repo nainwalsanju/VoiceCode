@@ -57,7 +57,11 @@
 5. Ultra-low-latency TTS option available for immediate feedback scenarios
 6. Transcript display shows conversation history
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+- [ ] 02-01-PLAN.md — Voice Cards UI and Transcript Panel
+- [ ] 02-02-PLAN.md — NVIDIA API LLM Integration with Sentence Streaming
+- [ ] 02-03-PLAN.md — Session State Management
 
 ---
 
