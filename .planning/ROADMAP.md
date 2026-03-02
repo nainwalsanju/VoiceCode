@@ -59,7 +59,7 @@
 
 **Plans:** 3 plans
 
-- [ ] 02-01-PLAN.md — Voice Cards UI and Transcript Panel
+- [x] 02-01-PLAN.md — Voice Cards UI and Transcript Panel
 - [ ] 02-02-PLAN.md — NVIDIA API LLM Integration with Sentence Streaming
 - [ ] 02-03-PLAN.md — Session State Management
 
@@ -109,8 +109,8 @@
 
 | Phase | Requirements | Status |
 |-------|--------------|--------|
-| 1 - Core Audio Pipeline | 16 | Not started |
-| 2 - Full Conversation Pipeline | 9 | Not started |
+| 1 - Core Audio Pipeline | 16 | Complete |
+| 2 - Full Conversation Pipeline | 9 | In Progress (1/3 plans) |
 | 3 - Conversation Flow & Voice Features | 8 | Not started |
 | 4 - Polish & Desktop Integration | 1 | Not started |
 

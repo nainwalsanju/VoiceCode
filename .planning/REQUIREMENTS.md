@@ -28,7 +28,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **TTS-01**: TTS response streams audio progressively (not wait for full text)
 - [ ] **TTS-02**: First audio plays within 250ms of response generation
-- [ ] **TTS-03**: Multiple voice options available (4-6 distinct voices)
+- [x] **TTS-03**: Multiple voice options available (4-6 distinct voices)
 - [ ] **TTS-04**: Qwen3-TTS integration (97ms latency, 3s voice cloning)
 - [ ] **TTS-05**: NeuTTS Air integration (real-time, instant voice cloning)
 - [ ] **TTS-06**: NeuTTS Nano integration (edge devices, 120M params)
@@ -62,7 +62,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **UI-01**: Push-to-talk or voice activation toggle
 - [ ] **UI-02**: Visual indicator showing current state (listening, processing, speaking)
-- [ ] **UI-03**: Transcript display showing conversation history
+- [x] **UI-03**: Transcript display showing conversation history
 - [ ] **UI-04**: Voice selection dropdown with preview capability
 - [ ] **UI-05**: Settings panel for voice cloning and preferences
 
@@ -118,7 +118,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STT-04 | Phase 1 | Pending |
 | TTS-01 | Phase 1 | Pending |
 | TTS-02 | Phase 1 | Pending |
-| TTS-03 | Phase 2 | Pending |
+| TTS-03 | Phase 2 | Complete |
 | TTS-04 | Phase 1 | Pending |
 | TTS-05 | Phase 2 | Pending |
 | AGENT-01 | Phase 2 | Pending |
@@ -136,7 +136,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLONE-04 | Phase 3 | Pending |
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
-| UI-03 | Phase 2 | Pending |
+| UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 3 | Pending |
 | UI-05 | Phase 3 | Pending |
 | DESK-01 | Phase 1 | Pending |

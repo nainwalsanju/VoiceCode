@@ -26,7 +26,7 @@
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
 | 1 | Core Audio Pipeline | 3/3 | ✅ Complete | 11 tasks |
-| 2 | Full Conversation Pipeline | 0/3 | Not started | - |
+| 2 | Full Conversation Pipeline | 1/3 | In Progress | - |
 | 3 | Conversation Flow & Voice Features | 0/3 | Not started | - |
 | 4 | Polish & Desktop Integration | 0/2 | Not started | - |
 
