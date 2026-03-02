@@ -84,7 +84,11 @@
 7. Settings panel for voice cloning and preferences
 8. Global hotkey activates voice input from anywhere
 
-**Plans:** TBD
+**Plans:** 3 plans created
+
+- [ ] 03-01-PLAN.md — Barge-in Interruption Handling
+- [ ] 03-02-PLAN.md — Voice Preview in Selector
+- [ ] 03-03-PLAN.md — Global Hotkey Activation
 
 ---
 
