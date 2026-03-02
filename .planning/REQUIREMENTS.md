@@ -14,20 +14,27 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AUDIO-03**: Audio streaming pipeline handles continuous capture without dropouts
 - [ ] **AUDIO-04**: Audio playback outputs TTS response through speakers
 
-### Speech-to-Text (STT)
+### Speech-to-Text (STT) - Pluggable Engine
 
 - [ ] **STT-01**: User speech is transcribed to text with <500ms latency
 - [ ] **STT-02**: Interim results are streamed while user is still speaking
 - [ ] **STT-03**: Transcription handles natural speech patterns (pauses, ums)
-- [ ] **STT-04**: Deepgram Nova-3 integration for high-accuracy transcription
+- [ ] **STT-04**: Moonshine v2 integration (80ms, CPU/edge)
+- [ ] **STT-05**: Voxtral Mini 4B integration (<500ms, browser/WebGPU)
+- [ ] **STT-06**: Parakeet TDT 0.6B integration (~30ms, GPU)
+- [ ] **STT-07**: User can switch between STT engines via settings
 
-### Text-to-Speech (TTS)
+### Text-to-Speech (TTS) - Pluggable Engine
 
 - [ ] **TTS-01**: TTS response streams audio progressively (not wait for full text)
 - [ ] **TTS-02**: First audio plays within 250ms of response generation
 - [ ] **TTS-03**: Multiple voice options available (4-6 distinct voices)
-- [ ] **TTS-04**: Inworld TTS-1.5-Max integration for high-quality output
-- [ ] **TTS-05**: Cartesia Sonic 3 integration for ultra-low-latency scenarios
+- [ ] **TTS-04**: Qwen3-TTS integration (97ms latency, 3s voice cloning)
+- [ ] **TTS-05**: NeuTTS Air integration (real-time, instant voice cloning)
+- [ ] **TTS-06**: NeuTTS Nano integration (edge devices, 120M params)
+- [ ] **TTS-07**: PocketTTS integration (CPU-only, 100M params)
+- [ ] **TTS-08**: Kokoro integration (best open-source quality)
+- [ ] **TTS-09**: User can switch between TTS engines via settings
 
 ### AI Agent
 
@@ -44,12 +51,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **CONV-04**: User can interrupt response mid-generation (barge-in)
 - [ ] **CONV-05**: TTS stops immediately when user starts speaking
 
-### Voice Cloning
+### Voice Cloning (All TTS Engines)
 
 - [ ] **CLONE-01**: User can upload audio sample (2-15 seconds) to clone voice
 - [ ] **CLONE-02**: Cloned voice is available immediately for TTS output
 - [ ] **CLONE-03**: Multiple cloned voices can be saved and selected
-- [ ] **CLONE-04**: Inworld zero-shot voice cloning integration
+- [ ] **CLONE-04**: Voice cloning works with all supported TTS engines
 
 ### User Interface
 

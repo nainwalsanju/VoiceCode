@@ -46,5 +46,27 @@ This appears to be an existing project with code in src/, backend/, and src-taur
 | TTS approach | Need streaming audio output similar to mobile AI assistants | — Pending |
 | Voice cloning | Allow users to clone any voice for personalization | — Pending |
 
+## Technology Stack Options
+
+### STT (Speech-to-Text) - User Selectable
+
+| Model | Latency | Requirements | Status |
+|-------|---------|--------------|--------|
+| **Moonshine v2** | ~80ms | CPU/Edge | Option |
+| **Voxtral Mini 4B** | <500ms | WebGPU/Browser | Option |
+| **Parakeet TDT 0.6B** | ~30ms | GPU (NVIDIA) | Option |
+
+### TTS (Text-to-Speech) - User Selectable
+
+| Model | Latency | Voice Cloning | Requirements | Priority |
+|-------|---------|---------------|--------------|----------|
+| **Qwen3-TTS** | 97ms | 3s sample | GPU recommended | 1 |
+| **NeuTTS Air** | Real-time | Instant | CPU/GPU | 2 |
+| **NeuTTS Nano** | Real-time | 3s sample | CPU/Edge | 3 |
+| **PocketTTS** | ~200ms | 5s sample | CPU (2 cores) | 4 |
+| **Kokoro** | ~100ms | Yes | GPU | 5 |
+
+*All TTS options support voice cloning. Users can switch between engines.*
+
 ---
 *Last updated: 2026-03-02 after initialization*
