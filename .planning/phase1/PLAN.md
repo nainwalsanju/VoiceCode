@@ -23,68 +23,75 @@
 
 **Tasks:**
 
-1. **Tauri Desktop Shell Setup**
-   - Files: `src-tauri/`, `src/App.tsx`
-   - Action: Configure Tauri with microphone permissions in `tauri.conf.json`
-   - Verify: `npm run tauri dev` launches window with audio permission prompt
+1. **Tauri Desktop Shell Setup** ✅ ALREADY DONE
+   - Already configured with microphone permissions
 
-2. **Audio Capture Pipeline**
-   - Files: `src/lib/audio/capture.ts`, `src-tauri/src/audio.rs`
-   - Action: Implement real-time audio capture from microphone using web audio API
-   - Verify: Audio chunks visible in devtools
+2. **Audio Capture Pipeline** ✅ ALREADY DONE
+   - VoiceButton.tsx captures audio via WebAudio API
+   - Streaming to backend via WebSocket
 
-3. **Window Controls**
-   - Files: `src-tauri/tauri.conf.json`
-   - Action: Configure native window controls
-   - Verify: Minimize, maximize, close buttons work
+3. **Window Controls** ✅ ALREADY DONE
+   - Native window controls configured
 
-**Status:** pending
+**Status:** COMPLETE
 
 ---
 
 ### Plan 2: Speech-to-Text Pipeline
 
-**Purpose:** Integrate Deepgram for real-time transcription
+**Purpose:** Integrate STT engines for real-time transcription
 
 **Tasks:**
 
-4. **Deepgram WebSocket Integration**
-   - Files: `src/lib/stt/deepgram.ts`
-   - Action: Connect to Deepgram Nova-3 via WebSocket, send audio chunks, receive transcription
-   - Handle interim results and final transcription
-   - Verify: Speak, see text appear within 500ms
+4. **Moonshine v2 Integration** ✅ ALREADY DONE
+   - Already working via useful-moonshine-onnx
+   - File: `backend/services/stt_stream_service.py`
 
-5. **VAD Integration (Silero)**
-   - Files: `src/lib/vad/silero.ts`
-   - Action: Integrate Silero VAD to detect speech start/stop boundaries
-   - Verify: VAD triggers on speech, detects silence after speech ends
+5. **Add Parakeet TDT Support** 🔄 PENDING
+   - Files: `backend/services/stt_service.py`, `stt_stream_service.py`
+   - Action: Add parakeet-tdt library support
 
-6. **Transcription Display**
-   - Files: `src/components/Transcript.tsx`
-   - Action: Display transcription in real-time with interim and final states
-   - Verify: Interim text appears while speaking
+6. **Add Voxtral Mini 4B Support** 🔄 PENDING
+   - Files: `backend/services/stt_service.py`
+   - Action: Add voxtral integration
 
-**Status:** pending
+7. **Transcription Display** ✅ ALREADY DONE
+   - VoiceButton receives transcriptions via WebSocket
+
+**Status:** 3/7 complete
 
 ---
 
 ### Plan 3: Text-to-Speech Pipeline
 
-**Purpose:** Integrate Inworld for streaming TTS
+**Purpose:** Integrate TTS engines with streaming
 
 **Tasks:**
 
-7. **Inworld TTS Integration**
-   - Files: `src/lib/tts/inworld.ts`
-   - Action: Integrate Inworld TTS-1.5-Max, send text, receive streaming audio
-   - Verify: First audio plays within 250ms
+8. **Qwen3-TTS Integration** 🔄 PENDING
+   - Files: `backend/services/tts_service.py`
+   - Action: Install qwen-tts, implement actual model loading
 
-8. **Audio Playback**
-   - Files: `src/lib/audio/playback.ts`
-   - Action: Handle TTS audio output through speakers with buffering
-   - Verify: TTS audio audible through speakers
+9. **NeuTTS Air Integration** 🔄 PENDING
+   - Files: `backend/services/tts_service.py`
+   - Action: Add neutts-air library support
 
-**Status:** pending
+10. **NeuTTS Nano Integration** 🔄 PENDING
+    - Files: `backend/services/tts_service.py`
+    - Action: Add neutts library support
+
+11. **PocketTTS Integration** 🔄 PENDING
+    - Files: `backend/services/tts_service.py`
+    - Action: Add pocket-tts library support
+
+12. **Kokoro Integration** 🔄 PENDING
+    - Files: `backend/services/tts_service.py`
+    - Action: Add kokoro library support
+
+13. **Audio Playback** ✅ ALREADY DONE
+    - VoiceButton.tsx streams TTS chunks via AudioContext
+
+**Status:** 1/13 complete
 
 ---
 
@@ -94,22 +101,16 @@
 
 **Tasks:**
 
-9. **State Machine**
-   - Files: `src/stores/conversation.ts`
-   - Action: Implement state machine: IDLE → LISTENING → PROCESSING → SPEAKING
-   - Verify: States transition correctly
+14. **State Machine** ✅ ALREADY DONE
+    - VoiceButton has: idle, connecting, listening, speaking, error states
 
-10. **Visual Indicators**
-    - Files: `src/components/StatusIndicator.tsx`
-    - Action: Show visual indicator for each state
-    - Verify: Indicator shows correct state throughout flow
+15. **Visual Indicators** ✅ ALREADY DONE
+    - VoiceButton shows animated rings, status text
 
-11. **Voice Activation**
-    - Files: `src/components/VoiceButton.tsx`
-    - Action: Implement voice activation toggle
-    - Verify: Button toggles listening mode on/off
+16. **Voice Activation** ✅ ALREADY DONE
+    - Push-to-talk via button click
 
-**Status:** pending
+**Status:** COMPLETE
 
 ---
 
@@ -124,3 +125,4 @@
 ---
 
 *Plan created: 2026-03-02*
+*Updated: 2026-03-02 after codebase review*

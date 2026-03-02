@@ -1,7 +1,5 @@
 fastapi>=0.115.0
 uvicorn[standard]>=0.34.0
-fastapi>=0.115.0
-uvicorn[standard]>=0.34.0
 python-dotenv>=1.0.0
 structlog>=24.4.0
 pydantic>=2.10.0
@@ -11,3 +9,6 @@ faster-whisper>=1.0.0
 useful-moonshine-onnx>=20251105.1.2
 librosa>=0.10.2
 soundfile>=0.12.1
+numpy>=1.24.0
+scipy>=1.11.0
+pyttsx3>=2.90
