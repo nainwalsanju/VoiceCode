@@ -123,17 +123,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONV-03 | Phase 2 | Pending |
 | CONV-04 | Phase 3 | Pending |
 | CONV-05 | Phase 3 | Pending |
-| CLONE-01 | Phase 4 | Pending |
-| CLONE-02 | Phase 4 | Pending |
-| CLONE-03 | Phase 4 | Pending |
-| CLONE-04 | Phase 4 | Pending |
+| CLONE-01 | Phase 3 | Pending |
+| CLONE-02 | Phase 3 | Pending |
+| CLONE-03 | Phase 3 | Pending |
+| CLONE-04 | Phase 3 | Pending |
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
 | UI-03 | Phase 2 | Pending |
-| UI-04 | Phase 4 | Pending |
-| UI-05 | Phase 4 | Pending |
+| UI-04 | Phase 3 | Pending |
+| UI-05 | Phase 3 | Pending |
 | DESK-01 | Phase 1 | Pending |
-| DESK-02 | Phase 5 | Pending |
+| DESK-02 | Phase 4 | Pending |
 | DESK-03 | Phase 3 | Pending |
 | DESK-04 | Phase 1 | Pending |
 
@@ -141,6 +141,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 - v1 requirements: 34 total
 - Mapped to phases: 34
 - Unmapped: 0 ✓
+
+**Phase Mapping Summary:**
+- Phase 1 (Core Audio Pipeline): 16 requirements
+- Phase 2 (Full Conversation Pipeline): 9 requirements
+- Phase 3 (Conversation Flow & Voice Features): 8 requirements
+- Phase 4 (Polish & Desktop Integration): 1 requirement
 
 ---
 *Requirements defined: 2026-03-02*
