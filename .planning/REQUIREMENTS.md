@@ -38,10 +38,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### AI Agent
 
-- [ ] **AGENT-01**: Transcribed text is sent to LLM for processing
-- [ ] **AGENT-02**: LLM response streams token-by-token for TTS input
+- [x] **AGENT-01**: Transcribed text is sent to LLM for processing
+- [x] **AGENT-02**: LLM response streams token-by-token for TTS input
 - [ ] **AGENT-03**: Agent maintains conversation context within session
-- [ ] **AGENT-04**: Fallback handling when LLM is unavailable
+- [x] **AGENT-04**: Fallback handling when LLM is unavailable
 
 ### Conversation Flow
 
@@ -121,10 +121,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TTS-03 | Phase 2 | Complete |
 | TTS-04 | Phase 1 | Pending |
 | TTS-05 | Phase 2 | Pending |
-| AGENT-01 | Phase 2 | Pending |
-| AGENT-02 | Phase 2 | Pending |
+| AGENT-01 | Phase 2 | Complete |
+| AGENT-02 | Phase 2 | Complete |
 | AGENT-03 | Phase 2 | Pending |
-| AGENT-04 | Phase 2 | Pending |
+| AGENT-04 | Phase 2 | Complete |
 | CONV-01 | Phase 1 | Pending |
 | CONV-02 | Phase 2 | Pending |
 | CONV-03 | Phase 2 | Pending |
