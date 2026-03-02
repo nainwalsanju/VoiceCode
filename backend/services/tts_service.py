@@ -1,6 +1,8 @@
 import io
 import structlog
+import time
 from typing import Optional, AsyncGenerator
+from dataclasses import dataclass
 import numpy as np
 
 logger = structlog.get_logger()
@@ -19,6 +21,25 @@ DEFAULT_RATE = "1.0"
 DEFAULT_PITCH = "0"
 CHUNK_SIZE = 4096
 
+# Latency targets per engine (in ms)
+ENGINE_LATENCY_TARGETS = {
+    "qwen3": 97,       # 97ms target
+    "neutts-air": 50,   # Real-time
+    "neutts-nano": 100, # Edge device
+    "pocket": 200,     # ~200ms
+    "kokoro": 100,     # ~100ms
+    "edge": 300,       # Network-based
+}
+
+
+@dataclass
+class TTSStreamResult:
+    """Result from TTS streaming with metadata."""
+    audio_chunk: bytes
+    is_first_chunk: bool
+    latency_ms: float
+    chunk_index: int
+
 
 class TTSService:
     def __init__(self):
@@ -29,6 +50,14 @@ class TTSService:
         self._pocket_model = None
         self._kokoro_model = None
         self._edge_model = None
+        
+        # Latency tracking
+        self._last_generation_time = 0.0
+        self._first_chunk_latency: Optional[float] = None
+        
+        # Model configs
+        self._qwen_config = {}
+        self._kokoro_voices = {}
 
     def _load_model(self, voice: str):
         if self._current_voice == voice:
@@ -159,10 +188,15 @@ class TTSService:
         rate: str = DEFAULT_RATE,
         pitch: str = DEFAULT_PITCH,
     ) -> AsyncGenerator[bytes, None]:
+        """Stream audio with latency tracking for first chunk."""
         if not text or not text.strip():
             raise ValueError("Text cannot be empty")
 
         self._load_model(voice)
+        # Track first chunk latency
+        start_time = time.perf_counter()
+        first_chunk_sent = False
+        
         logger.info("streaming_audio", text_length=len(text), voice=voice)
 
         try:
@@ -171,23 +205,89 @@ class TTSService:
                 communicate = edge_tts.Communicate(text, self._edge_model)
                 async for chunk in communicate.stream():
                     if chunk["type"] == "audio":
+                        chunk_latency = (time.perf_counter() - start_time) * 1000
+                        if not first_chunk_sent:
+                            self._first_chunk_latency = chunk_latency
+                            first_chunk_sent = True
+                            logger.info("tts_first_chunk_latency", ms=chunk_latency)
                         yield chunk["data"]
+                        
             elif self._qwen3_model:
+                # Qwen3 TTS streaming
                 for chunk in self._qwen3_model.stream_generate(text):
                     audio_chunk = self._audio_to_bytes(chunk)
                     if audio_chunk:
+                        chunk_latency = (time.perf_counter() - start_time) * 1000
+                        if not first_chunk_sent:
+                            self._first_chunk_latency = chunk_latency
+                            first_chunk_sent = True
+                            logger.info("tts_first_chunk_latency", ms=chunk_latency)
                         yield audio_chunk
+                        
+            elif self._neutts_air_model:
+                # NeuTTS Air streaming - instant voice clone
+                for audio_chunk in self._neutts_air_model.stream_speak(text):
+                    chunk_latency = (time.perf_counter() - start_time) * 1000
+                    if not first_chunk_sent:
+                        self._first_chunk_latency = chunk_latency
+                        first_chunk_sent = True
+                        logger.info("tts_first_chunk_latency", ms=chunk_latency)
+                    yield self._audio_to_bytes(audio_chunk)
+                    
+            elif self._neutts_nano_model:
+                # NeuTTS Nano streaming - edge optimized
+                for audio_chunk in self._neutts_nano_model.stream_speak(text):
+                    chunk_latency = (time.perf_counter() - start_time) * 1000
+                    if not first_chunk_sent:
+                        self._first_chunk_latency = chunk_latency
+                        first_chunk_sent = True
+                        logger.info("tts_first_chunk_latency", ms=chunk_latency)
+                    yield self._audio_to_bytes(audio_chunk)
+                    
             elif self._pocket_model:
+                # PocketTTS streaming
                 for chunk in self._pocket_model.stream_generate(text):
                     audio_chunk = self._audio_to_bytes(chunk)
                     if audio_chunk:
+                        chunk_latency = (time.perf_counter() - start_time) * 1000
+                        if not first_chunk_sent:
+                            self._first_chunk_latency = chunk_latency
+                            first_chunk_sent = True
+                            logger.info("tts_first_chunk_latency", ms=chunk_latency)
                         yield audio_chunk
+                        
+            elif self._kokoro_model:
+                # Kokoro streaming
+                voice_map = self._get_kokoro_voice(voice)
+                for audio_chunk in self._kokoro_model.stream_speak(text, voice=voice_map):
+                    chunk_latency = (time.perf_counter() - start_time) * 1000
+                    if not first_chunk_sent:
+                        self._first_chunk_latency = chunk_latency
+                        first_chunk_sent = True
+                        logger.info("tts_first_chunk_latency", ms=chunk_latency)
+                    yield self._audio_to_bytes(audio_chunk)
             else:
+                # Fallback: generate placeholder chunks
                 for i in range(max(1, len(text) // 10)):
+                    chunk_latency = (time.perf_counter() - start_time) * 1000
+                    if not first_chunk_sent:
+                        self._first_chunk_latency = chunk_latency
+                        first_chunk_sent = True
                     yield self._generate_chunk(512)
+                    
         except Exception as e:
             logger.error("tts_stream_error", error=str(e))
             yield self._generate_chunk(512)
+        
+        self._last_generation_time = time.perf_counter()
+
+    def _get_kokoro_voice(self, voice: str) -> str:
+        """Map voice name to Kokoro voice pack."""
+        voice_map = {
+            "kokoro-en": "af_sarah",
+            "kokoro-zh": "zf_xiaoxiao",
+        }
+        return voice_map.get(voice, "af_sarah")
 
     def _audio_to_bytes(self, audio) -> bytes:
         if audio is None:
@@ -231,6 +331,22 @@ class TTSService:
 
     def get_default_voice(self) -> str:
         return DEFAULT_VOICE
+
+    def get_first_chunk_latency(self) -> Optional[float]:
+        """Get the latency to first audio chunk in ms."""
+        return self._first_chunk_latency
+
+    def get_engine_latency_target(self, voice: str) -> int:
+        """Get the target latency for the given engine."""
+        for engine, target in ENGINE_LATENCY_TARGETS.items():
+            if voice.startswith(engine):
+                return target
+        return 250  # Default target
+
+    def reset_latency_tracking(self):
+        """Reset latency tracking for new synthesis."""
+        self._first_chunk_latency = None
+        self._last_generation_time = 0.0
 
 
 _tts_service: Optional[TTSService] = None
