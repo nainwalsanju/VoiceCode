@@ -4,13 +4,21 @@ from typing import Optional, AsyncGenerator
 
 logger = structlog.get_logger()
 
-# We support Pocket TTS (Kyutai) and Neutts Nano as requested by the user
+# We support multiple TTS engines as requested:
+# Priority 1: Qwen3-TTS (97ms, 3s voice cloning)
+# Priority 2: NeuTTS Air (real-time, instant voice cloning)
+# Priority 3: NeuTTS Nano (edge devices, 120M params)
+# Priority 4: PocketTTS (CPU-only, 100M params)
+# Priority 5: Kokoro (best open-source quality)
 AVAILABLE_VOICES = {
+    "qwen3": ["qwen3-tts-0.6b", "qwen3-tts-1.7b"],
+    "neutts-air": ["neutts-air-en", "neutts-air-multi"],
+    "neutts-nano": ["neutts-nano-en", "neutts-nano-hi", "neutts-nano-de", "neutts-nano-fr"],
     "pocket": ["pocket-tts-en", "pocket-tts-hi"],
-    "neutts": ["neutts-nano-en", "neutts-nano-hi"]
+    "kokoro": ["kokoro-zh", "kokoro-en"],
 }
 
-DEFAULT_VOICE = "neutts-nano-en"
+DEFAULT_VOICE = "qwen3-tts-0.6b"  # Best latency/quality balance
 DEFAULT_RATE = "1.0"
 DEFAULT_PITCH = "0"
 CHUNK_SIZE = 4096
@@ -18,8 +26,11 @@ CHUNK_SIZE = 4096
 class TTSService:
     def __init__(self):
         self._current_voice: Optional[str] = None
-        self._neutts_model = None
+        self._qwen3_model = None
+        self._neutts_air_model = None
+        self._neutts_nano_model = None
         self._pocket_model = None
+        self._kokoro_model = None
 
     def _load_model(self, voice: str):
         if self._current_voice == voice:
@@ -27,15 +38,37 @@ class TTSService:
             
         logger.info("loading_tts_model", voice=voice)
         
-        # Stub implementation for loading models into CPU memory.
-        # In actual deployment, this imports the specified local pip packages 
-        # (e.g., `import neutts`) and loads the neural weights to CPU.
-        if voice.startswith("neutts"):
-            self._neutts_model = "Loaded Neutts Nano Model" 
+        # Stub implementations - in production, load actual models
+        if voice.startswith("qwen3"):
+            self._qwen3_model = "Loaded Qwen3-TTS (97ms latency, 3s voice clone)"
+            self._neutts_air_model = None
+            self._neutts_nano_model = None
             self._pocket_model = None
+            self._kokoro_model = None
+        elif voice.startswith("neutts-air"):
+            self._neutts_air_model = "Loaded NeuTTS Air (real-time, instant voice clone)"
+            self._qwen3_model = None
+            self._neutts_nano_model = None
+            self._pocket_model = None
+            self._kokoro_model = None
+        elif voice.startswith("neutts-nano"):
+            self._neutts_nano_model = "Loaded NeuTTS Nano (edge, 120M params)"
+            self._qwen3_model = None
+            self._neutts_air_model = None
+            self._pocket_model = None
+            self._kokoro_model = None
         elif voice.startswith("pocket"):
-            self._pocket_model = "Loaded Pocket TTS Model"
-            self._neutts_model = None
+            self._pocket_model = "Loaded PocketTTS (CPU-only, 100M params)"
+            self._qwen3_model = None
+            self._neutts_air_model = None
+            self._neutts_nano_model = None
+            self._kokoro_model = None
+        elif voice.startswith("kokoro"):
+            self._kokoro_model = "Loaded Kokoro (best open-source quality)"
+            self._qwen3_model = None
+            self._neutts_air_model = None
+            self._neutts_nano_model = None
+            self._pocket_model = None
             
         self._current_voice = voice
         logger.info("tts_model_loaded", voice=voice)

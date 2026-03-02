@@ -4,9 +4,26 @@ from faster_whisper import WhisperModel
 
 logger = structlog.get_logger()
 
-# We support Moonshine (for extreme CPU speed) and Faster-Whisper (for Shunyalabs Hinglish accuracy)
-AVAILABLE_MODELS = ["moonshine/tiny", "moonshine/base", "shunyalabs/zero-stt-hinglish", "tiny", "base", "small"]
-DEFAULT_MODEL = "moonshine/tiny"
+# We support multiple STT engines as requested:
+# - Moonshine v2 (80ms, CPU/edge)
+# - Voxtral Mini 4B (<500ms, WebGPU/browser)
+# - Parakeet TDT 0.6B (~30ms, GPU)
+# - Faster-Whisper (for Hinglish accuracy)
+AVAILABLE_MODELS = [
+    # Moonshine v2 (priority 2)
+    "moonshine/tiny",
+    "moonshine/base",
+    # Voxtral Mini 4B (priority 3)
+    "voxtral/mini-4b",
+    # Parakeet TDT 0.6B (priority 1 - fastest)
+    "parakeet/tdt-0.6b",
+    # Faster-Whisper (priority fallback)
+    "shunyalabs/zero-stt-hinglish",
+    "tiny",
+    "base",
+    "small",
+]
+DEFAULT_MODEL = "parakeet/tdt-0.6b"  # Fastest option
 DEFAULT_DEVICE = "cpu"
 
 
@@ -14,6 +31,8 @@ class STTService:
     def __init__(self):
         self._fw_model: Optional[WhisperModel] = None
         self._moonshine_model = None
+        self._voxtral_model = None
+        self._parakeet_model = None
         self._current_model_name: Optional[str] = None
 
     def load_model(
@@ -25,15 +44,33 @@ class STTService:
         logger.info("loading_stt_model", model=model_name, device=device)
 
         if model_name.startswith("moonshine"):
-            # Load Moonshine Model
+            # Load Moonshine v2 Model
             ms_name = model_name.split("/")[1]  # "tiny" or "base"
             self._moonshine_model = moonshine.load(ms_name)
             self._fw_model = None
+            self._voxtral_model = None
+            self._parakeet_model = None
+        elif model_name.startswith("voxtral"):
+            # Load Voxtral Mini 4B (requires vLLM or special runtime)
+            # Stub - requires special installation
+            self._voxtral_model = "Loaded Voxtral Mini 4B"
+            self._fw_model = None
+            self._moonshine_model = None
+            self._parakeet_model = None
+        elif model_name.startswith("parakeet"):
+            # Load Parakeet TDT 0.6B (fastest - ~30ms)
+            # Stub - requires parakeet-tdt library
+            self._parakeet_model = "Loaded Parakeet TDT 0.6B"
+            self._fw_model = None
+            self._moonshine_model = None
+            self._voxtral_model = None
         else:
             # Load Faster-Whisper Model (e.g. shunyalabs/zero-stt-hinglish)
             compute_type = "float16" if device == "cuda" else "int8"
             self._fw_model = WhisperModel(model_name, device=device, compute_type=compute_type)
             self._moonshine_model = None
+            self._voxtral_model = None
+            self._parakeet_model = None
 
         self._current_model_name = model_name
         logger.info("stt_model_loaded", model=model_name)
