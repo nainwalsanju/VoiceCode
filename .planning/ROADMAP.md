@@ -57,11 +57,11 @@
 5. Ultra-low-latency TTS option available for immediate feedback scenarios
 6. Transcript display shows conversation history
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans executed
 
 - [x] 02-01-PLAN.md — Voice Cards UI and Transcript Panel
-- [ ] 02-02-PLAN.md — NVIDIA API LLM Integration with Sentence Streaming
-- [ ] 02-03-PLAN.md — Session State Management
+- [x] 02-02-PLAN.md — NVIDIA API LLM Integration with Sentence Streaming
+- [x] 02-03-PLAN.md — Session State Management
 
 ---
 
@@ -110,7 +110,8 @@
 | Phase | Requirements | Status |
 |-------|--------------|--------|
 | 1 - Core Audio Pipeline | 16 | Complete |
-| 2 - Full Conversation Pipeline | 2/3 | In Progress|  | 3 - Conversation Flow & Voice Features | 8 | Not started |
+| 2 - Full Conversation Pipeline | 3/3 | Complete |
+| 3 - Conversation Flow & Voice Features | 8 | Not started |
 | 4 - Polish & Desktop Integration | 1 | Not started |
 
 **Total:** 34/34 requirements mapped ✓
