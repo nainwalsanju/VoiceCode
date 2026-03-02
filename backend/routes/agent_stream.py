@@ -58,6 +58,9 @@ async def flush_sentence_to_tts(sentence: str, tts_service, websocket, manager):
     
     sentence = sentence.strip()
     
+    # Send speaking state when TTS starts
+    await manager.send_message({"type": "state", "state": "speaking"}, websocket)
+    
     # Notify client that a sentence is starting
     await manager.send_message({
         "type": "sentence_start",
@@ -157,6 +160,10 @@ async def websocket_agent_stream(websocket: WebSocket):
                 
             elif message.get("type") == "audio_end":
                 print("trace_audio_end_received", flush=True)
+                
+                # Send listening state (user stopped speaking, processing starts)
+                await manager.send_message({"type": "state", "state": "listening"}, websocket)
+                
                 # Compute final transcription
                 try:
                     result = await transcribe_stream(bytes(cumulative_audio))
@@ -176,8 +183,8 @@ async def websocket_agent_stream(websocket: WebSocket):
                     context_buffer.append({"role": "user", "content": text})
                     logger.info("agent_received_text", text=text)
                     
-                    # Notify LLM processing is starting
-                    await manager.send_message({"type": "llm_start"}, websocket)
+                    # Send processing state (LLM thinking)
+                    await manager.send_message({"type": "state", "state": "processing"}, websocket)
                     
                     # Get LLM service
                     llm_service = get_llm_service()
@@ -227,6 +234,9 @@ async def websocket_agent_stream(websocket: WebSocket):
                     
                     # Notify LLM processing is complete
                     await manager.send_message({"type": "llm_end"}, websocket)
+                    
+                    # Send idle state (conversation turn complete)
+                    await manager.send_message({"type": "state", "state": "idle"}, websocket)
 
             elif message.get("type") == "reset":
                 context_buffer = []
