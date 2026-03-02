@@ -1,6 +1,6 @@
 # VoiceCode State
 
-**Last updated:** 2026-03-02
+**Last updated:** 2026-03-02T18:25:00Z
 
 ## Project Reference
 
@@ -15,9 +15,9 @@
 | Attribute | Value |
 |-----------|-------|
 | **Phase** | 1 - Core Audio Pipeline |
-| **Plan** | Not started |
-| **Status** | Not started |
-| **Progress** | 0% |
+| **Plan** | Core Audio Pipeline |
+| **Status** | Completed |
+| **Progress** | 100% |
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
-| 1 | Core Audio Pipeline | 0/3 | Not started | - |
+| 1 | Core Audio Pipeline | 3/3 | ✅ Complete | 11 tasks |
 | 2 | Full Conversation Pipeline | 0/3 | Not started | - |
 | 3 | Conversation Flow & Voice Features | 0/3 | Not started | - |
 | 4 | Polish & Desktop Integration | 0/2 | Not started | - |
@@ -49,12 +49,14 @@
 
 | Decision | Rationale | Status |
 |----------|-----------|--------|
-| Use cascaded STT→LLM→TTS architecture | Proven reliability, component flexibility | Pending tech selection |
-| Deepgram Nova-3 for STT | 247ms median, 1.62% WER | Researched |
-| Inworld TTS-1.5-Max for primary TTS | ELO 1160, sub-250ms P90 | Researched |
-| Cartesia Sonic 3 for low-latency | 40ms time-to-first-audio | Researched |
-| Inworld for voice cloning | Free with TTS API, zero-shot | Researched |
-| Tauri for desktop | Existing src-tauri, Rust backend | Researched |
+| Use cascaded STT→LLM→TTS architecture | Proven reliability, component flexibility | ✅ Implemented |
+| Silero VAD for voice detection | Industry-standard edge VAD | ✅ Implemented |
+| Moonshine v2 for STT | ~80ms latency, CPU-friendly | ✅ Implemented |
+| Qwen3-TTS for primary TTS | 97ms latency, voice cloning | ✅ Implemented |
+| 5 TTS engines available | Qwen3, NeuTTS Air/Nano, PocketTTS, Kokoro | ✅ Implemented |
+| Configurable turn endpointing | 500ms silence default, adaptive threshold | ✅ Implemented |
+| Natural speech handling | Filler word removal, turn completion | ✅ Implemented |
+| Tauri for desktop | Existing src-tauri, Rust backend | ✅ Verified |
 
 ### Technical Notes
 
@@ -72,12 +74,13 @@
 
 ## Session Continuity
 
-**Ready for:** `/gsd-plan-phase 1`
+**Ready for:** Phase 2: Full Conversation Pipeline
 
 **Next steps:**
-1. Plan Phase 1 (Core Audio Pipeline)
-2. Execute Phase 1 plans
-3. Validate audio pipeline before moving to Phase 2
+1. ✅ Complete Phase 1 (Core Audio Pipeline) - DONE
+2. Plan Phase 2 (Full Conversation Pipeline)
+3. Execute Phase 2 plans
+4. Validate full conversation loop
 
 ---
 
