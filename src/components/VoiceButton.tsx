@@ -3,6 +3,7 @@ import { useSessionStore, SessionState } from '../stores/sessionStore';
 import { useTranscriptStore } from '../stores/transcriptStore';
 import { registerGlobalHotkey, unregisterGlobalHotkey } from '../hooks/useGlobalHotkey';
 import { getSettings } from '../api/settings';
+import { useBargeIn } from '../hooks/useBargeIn';
 
 interface VoiceButtonProps {
   onTranscript?: (text: string) => void;
@@ -17,13 +18,14 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
   const [hotkeyActivated, setHotkeyActivated] = useState(false);
   
   // Use session store for state management
-  const { 
+  const {
     currentState,
     setState,
     startListening,
     startProcessing,
     startSpeaking,
     endSpeaking,
+    interruptSpeaking,
     isContinuousMode
   } = useSessionStore();
   
@@ -308,6 +310,33 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       cleanup?.();
     };
   }, [startInteraction, stopInteraction]);
+
+  // Barge-in handler - interrupts TTS when user speaks during playback
+  const handleBargeIn = useCallback(() => {
+    // 1. Suspend audio immediately
+    if (audioContextRef.current) {
+      audioContextRef.current.suspend();
+    }
+
+    // 2. Send cancel to backend
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'cancel_tts' }));
+    }
+
+    // 3. Update state
+    interruptSpeaking();
+
+    // 4. Reset nextPlayTimeRef to prevent audio glitches on next playback
+    nextPlayTimeRef.current = 0;
+  }, [interruptSpeaking]);
+
+  // Enable barge-in detection only when SPEAKING
+  useBargeIn({
+    enabled: wsSessionState === 'SPEAKING',
+    onBargeIn: handleBargeIn,
+    threshold: 0.3, // Lower threshold for faster response
+    debounceMs: 50, // Quick debounce for interruption
+  });
 
   // Get state label based on current state
   const getStateLabel = () => {
