@@ -14,6 +14,7 @@ interface SessionActions {
   startProcessing: () => boolean;
   startSpeaking: () => boolean;
   endSpeaking: () => boolean;
+  interruptSpeaking: () => boolean;
   setContinuousMode: (enabled: boolean) => void;
   reset: () => void;
 }
@@ -79,7 +80,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   endSpeaking: () => {
     const { isContinuousMode } = get();
-    
+
     if (isContinuousMode) {
       // In continuous mode, go back to listening for next turn
       set({ currentState: 'LISTENING' });
@@ -87,6 +88,17 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       set({ currentState: 'IDLE' });
     }
     return true;
+  },
+
+  interruptSpeaking: () => {
+    const { currentState } = get();
+    
+    if (currentState === 'SPEAKING') {
+      set({ currentState: 'LISTENING' });
+      return true;
+    }
+    
+    return false;
   },
 
   setContinuousMode: (enabled: boolean) => {
