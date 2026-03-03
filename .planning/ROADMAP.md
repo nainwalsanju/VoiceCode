@@ -88,7 +88,7 @@
 
 - [ ] 03-01-PLAN.md — Barge-in Interruption Handling
 - [ ] 03-02-PLAN.md — Voice Preview in Selector
-- [ ] 03-03-PLAN.md — Global Hotkey Activation
+- [x] 03-03-PLAN.md — Global Hotkey Activation
 
 ---
 

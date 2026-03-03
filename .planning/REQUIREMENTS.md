@@ -64,13 +64,13 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UI-02**: Visual indicator showing current state (listening, processing, speaking)
 - [x] **UI-03**: Transcript display showing conversation history
 - [x] **UI-04**: Voice selection dropdown with preview capability
-- [ ] **UI-05**: Settings panel for voice cloning and preferences
+- [x] **UI-05**: Settings panel for voice cloning and preferences
 
 ### Desktop Integration
 
 - [ ] **DESK-01**: Application runs as desktop app (Tauri)
 - [ ] **DESK-02**: System tray support for background operation
-- [ ] **DESK-03**: Global hotkey to activate voice input
+- [x] **DESK-03**: Global hotkey to activate voice input
 - [ ] **DESK-04**: Native window controls (minimize, maximize, close)
 
 ## v2 Requirements
@@ -138,10 +138,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-02 | Phase 1 | Pending |
 | UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 3 | Complete |
-| UI-05 | Phase 3 | Pending |
+| UI-05 | Phase 3 | Complete |
 | DESK-01 | Phase 1 | Pending |
 | DESK-02 | Phase 4 | Pending |
-| DESK-03 | Phase 3 | Pending |
+| DESK-03 | Phase 3 | Complete |
 | DESK-04 | Phase 1 | Pending |
 
 **Coverage:**

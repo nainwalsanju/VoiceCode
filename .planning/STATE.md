@@ -97,14 +97,15 @@ progress:
 
 ## Session Continuity
 
-**Ready for:** Phase 3: Conversation Flow & Voice Features
+**Ready for:** Phase 3 Plans 03-01 and 03-02 (Barge-in Handling, Voice Preview)
 
 **Next steps:**
 1. ✅ Complete Phase 1 (Core Audio Pipeline) - DONE
 2. ✅ Complete Phase 2 Plan 01 (Voice Selection & Transcript UI) - DONE
 3. ✅ Complete Phase 2 Plan 02 (NVIDIA LLM Integration) - DONE
 4. ✅ Complete Phase 2 Plan 03 (Session State Management) - DONE
-5. Plan and execute Phase 3
+5. ✅ Complete Phase 3 Plan 03 (Global Hotkey Activation) - DONE
+6. Execute Phase 3 Plans 01-02 (Barge-in, Voice Preview)
 
 ---
 
