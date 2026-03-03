@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AppSettings, Microphone, TtsVoice, getSettings, updateSettings, getMicrophones, getTtsVoices } from '../api/settings';
 import { setAlwaysOnTop } from '../hooks/useWindowManagement';
 import { enable, disable } from '@tauri-apps/plugin-autostart';
-import { registerGlobalHotkey } from '../hooks/useGlobalHotkey';
+import { registerGlobalHotkey, unregisterGlobalHotkey } from '../hooks/useGlobalHotkey';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
       setMicrophones(micData);
       setVoices(voiceData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load settings');
+      setError(err instanceof Error ? err.message : 'Datalink failure: Could not retrieve configuration');
     } finally {
       setLoading(false);
     }
@@ -43,27 +43,42 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
   const handleSave = async (key: string, value: unknown) => {
     if (!settings) return;
+    
     try {
+      // Unregister old hotkey before changing it
+      if (key === 'hotkey' && settings.hotkey) {
+        await unregisterGlobalHotkey(settings.hotkey);
+      }
+
       const updated = await updateSettings({ [key]: value });
       setSettings(updated);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save settings');
+      setError(err instanceof Error ? err.message : 'Datalink failure: Synchronization failed');
     }
+  };
+
+  // Normalize hotkey format for consistency
+  const normalizeHotkey = (input: string): string => {
+    return input
+      .toUpperCase()
+      .replace(/CONTROL/g, 'CTRL')
+      .replace(/COMMAND|CMD|META/g, 'SUPER')
+      .replace(/\s+/g, '');
   };
 
   const handleToggle = async (key: keyof AppSettings) => {
     if (!settings) return;
-    
+
     const newValue = !settings[key];
-    
+
     if (key === 'always_on_top') {
       try {
         await setAlwaysOnTop(newValue);
       } catch (err) {
-        console.error('Failed to set always on top:', err);
+        console.error('Window Management Error:', err);
       }
     }
-    
+
     if (key === 'auto_start') {
       try {
         if (newValue) {
@@ -72,17 +87,17 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
           await disable();
         }
       } catch (err) {
-        console.error('Failed to toggle autostart:', err);
+        console.error('Initialization Error:', err);
       }
     }
-    
+
     handleSave(key, newValue);
   };
 
   useEffect(() => {
     if (settings && settings.hotkey) {
       const handleVoiceActivation = () => {
-        console.log('Voice activation hotkey pressed');
+        console.log('Voice activation hotkey triggered');
       };
       registerGlobalHotkey(settings.hotkey, handleVoiceActivation);
     }
@@ -91,272 +106,266 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-surface rounded-xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
-          <h2 className="text-xl font-bold">Settings</h2>
+    <div className="fixed inset-0 bg-background/20 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+      <div className="bg-surface/80 backdrop-blur-2xl rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl border border-border flex flex-col relative scale-in-center animate-in zoom-in-95 duration-300">
+        {/* Glow effect */}
+        <div className="absolute top-0 left-1/4 w-1/2 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent blur-sm"></div>
+
+        <div className="flex items-center justify-between px-8 py-6 border-b border-border/50">
+          <div>
+            <h2 className="text-sm font-mono font-bold uppercase tracking-[0.3em] text-text-primary">System_Core_Config</h2>
+            <p className="text-[10px] font-mono text-text-secondary uppercase opacity-50 mt-1">Adjust neural parameters & interface</p>
+          </div>
           <button
             onClick={onClose}
-            className="text-text-secondary hover:text-text-primary transition-colors"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-surface/50 transition-all border border-transparent hover:border-border cursor-pointer group"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
+        <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
           {loading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full"></div>
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+              <div className="animate-spin w-10 h-10 border-2 border-primary border-t-transparent rounded-full shadow-neon"></div>
+              <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-secondary uppercase animate-pulse">Scanning Registry...</span>
             </div>
           )}
 
           {error && (
-            <div className="bg-error/20 border border-error rounded-lg px-4 py-3 mb-4">
-              <p className="text-error text-sm">{error}</p>
+            <div className="bg-error/10 border border-error/20 rounded-xl p-4 mb-8 animate-in slide-in-from-top-4 duration-500 flex items-center gap-4">
+              <div className="w-2 h-2 rounded-full bg-error animate-ping shrink-0"></div>
+              <p className="text-error font-mono text-[10px] font-bold uppercase tracking-tight">{error}</p>
             </div>
           )}
 
           {!loading && settings && (
-            <div className="space-y-6">
-              <section>
-                <h3 className="text-lg font-semibold mb-4 text-primary">Speech Recognition</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      STT Provider
+            <div className="space-y-10">
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">01 // Acoustic_Vocal_Capture</h3>
+                  <div className="flex-1 h-px bg-gradient-to-r from-primary/20 to-transparent"></div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                      Link_Provider
                     </label>
                     <select
                       value={settings.stt_provider}
                       onChange={(e) => handleSave('stt_provider', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-background border border-slate-600 text-text-primary focus:outline-none focus:border-primary"
+                      className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border text-text-primary font-mono text-xs focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer transition-all"
                     >
-                      <option value="google">Google Cloud Speech</option>
-                      <option value="whisper">Whisper (Local)</option>
-                      <option value="assemblyai">AssemblyAI</option>
+                      <option value="google" className="bg-background">GOOGLE_CLOUD</option>
+                      <option value="whisper" className="bg-background">WHISPER_LOCAL</option>
+                      <option value="assemblyai" className="bg-background">ASSEMBLY_AI</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Microphone
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                      Acoustic_Source
                     </label>
                     <select
                       value={settings.microphone}
                       onChange={(e) => handleSave('microphone', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-background border border-slate-600 text-text-primary focus:outline-none focus:border-primary"
+                      className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border text-text-primary font-mono text-xs focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer transition-all"
                     >
-                      <option value="">Default</option>
+                      <option value="" className="bg-background">SYSTEM_DEFAULT</option>
                       {microphones.map((mic) => (
-                        <option key={mic.id} value={mic.id}>
-                          {mic.name}
+                        <option key={mic.id} value={mic.id} className="bg-background">
+                          {mic.name.toUpperCase().replace(/\s+/g, '_')}
                         </option>
                       ))}
                     </select>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Language
-                    </label>
-                    <select
-                      value={settings.language}
-                      onChange={(e) => handleSave('language', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-background border border-slate-600 text-text-primary focus:outline-none focus:border-primary"
-                    >
-                      <option value="en-US">English (US)</option>
-                      <option value="en-GB">English (UK)</option>
-                      <option value="es-ES">Spanish</option>
-                      <option value="fr-FR">French</option>
-                      <option value="de-DE">German</option>
-                      <option value="ja-JP">Japanese</option>
-                      <option value="zh-CN">Chinese (Simplified)</option>
-                    </select>
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                    Language_Set
+                  </label>
+                  <select
+                    value={settings.language}
+                    onChange={(e) => handleSave('language', e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border text-text-primary font-mono text-xs focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer transition-all"
+                  >
+                    <option value="en-US" className="bg-background">ENGLISH_US</option>
+                    <option value="en-GB" className="bg-background">ENGLISH_UK</option>
+                    <option value="es-ES" className="bg-background">SPANISH_ESP</option>
+                    <option value="fr-FR" className="bg-background">FRENCH_FRA</option>
+                    <option value="de-DE" className="bg-background">GERMAN_DEU</option>
+                    <option value="ja-JP" className="bg-background">JAPANESE_JPN</option>
+                    <option value="zh-CN" className="bg-background">CHINESE_ZHO</option>
+                  </select>
                 </div>
               </section>
 
-              <section>
-                <h3 className="text-lg font-semibold mb-4 text-primary">Text-to-Speech</h3>
-                
-                <div className="space-y-4">
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-secondary">02 // Vocal_Synthesis</h3>
+                  <div className="flex-1 h-px bg-gradient-to-r from-secondary/20 to-transparent"></div>
+                </div>
+
+                <div className="bg-surface/30 border border-border rounded-xl p-6 space-y-6 shadow-inner">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-text-secondary">
-                      Enable TTS
-                    </label>
+                    <div className="flex flex-col">
+                      <label className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-widest">
+                        Initialize_Synthesis
+                      </label>
+                      <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Master switch for audio feedback</span>
+                    </div>
                     <button
                       onClick={() => handleToggle('tts_enabled')}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        settings.tts_enabled ? 'bg-primary' : 'bg-slate-600'
-                      }`}
+                      className={`relative w-12 h-6 rounded-full transition-all duration-300 border border-transparent ${settings.tts_enabled ? 'bg-secondary shadow-[0_0_10px_rgba(var(--secondary-rgb),0.5)]' : 'bg-surface border-border'
+                        }`}
                     >
                       <span
-                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          settings.tts_enabled ? 'translate-x-6' : ''
-                        }`}
+                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-all duration-300 ${settings.tts_enabled ? 'translate-x-6 scale-110' : 'opacity-30'
+                          }`}
                       />
                     </button>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Voice
-                    </label>
-                    <select
-                      value={settings.tts_voice}
-                      onChange={(e) => handleSave('tts_voice', e.target.value)}
-                      disabled={!settings.tts_enabled}
-                      className="w-full px-4 py-2 rounded-lg bg-background border border-slate-600 text-text-primary focus:outline-none focus:border-primary disabled:opacity-50"
-                    >
-                      {voices.map((voice) => (
-                        <option key={voice.id} value={voice.id}>
-                          {voice.name} ({voice.language})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <div className="space-y-6 pt-4 border-t border-border/30 opacity-100 transition-opacity">
+                    <div className="space-y-2 opacity-100">
+                      <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                        Neural_Voice_Model
+                      </label>
+                      <select
+                        value={settings.tts_voice}
+                        onChange={(e) => handleSave('tts_voice', e.target.value)}
+                        disabled={!settings.tts_enabled}
+                        className="w-full px-4 py-3 rounded-xl bg-background/50 border border-border text-text-primary font-mono text-xs focus:outline-none focus:ring-1 focus:ring-secondary/50 cursor-pointer transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                      >
+                        {voices.map((voice) => (
+                          <option key={voice.id} value={voice.id} className="bg-background">
+                            {voice.name.toUpperCase()} ({voice.language.split('-')[0]})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Speed: {settings.tts_speed.toFixed(1)}x
-                    </label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="2.0"
-                      step="0.1"
-                      value={settings.tts_speed}
-                      onChange={(e) => handleSave('tts_speed', parseFloat(e.target.value))}
-                      disabled={!settings.tts_enabled}
-                      className="w-full accent-primary disabled:opacity-50"
-                    />
-                  </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center px-1">
+                          <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest">
+                            Tempo_Scalar
+                          </label>
+                          <span className="text-[10px] font-mono font-bold text-secondary uppercase">{settings.tts_speed.toFixed(1)}x</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="2.0"
+                          step="0.1"
+                          value={settings.tts_speed}
+                          onChange={(e) => handleSave('tts_speed', parseFloat(e.target.value))}
+                          disabled={!settings.tts_enabled}
+                          className="w-full h-1 bg-surface rounded-full appearance-none cursor-pointer accent-secondary disabled:opacity-20"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Pitch: {settings.tts_pitch.toFixed(1)}
-                    </label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="2.0"
-                      step="0.1"
-                      value={settings.tts_pitch}
-                      onChange={(e) => handleSave('tts_pitch', parseFloat(e.target.value))}
-                      disabled={!settings.tts_enabled}
-                      className="w-full accent-primary disabled:opacity-50"
-                    />
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center px-1">
+                          <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest">
+                            Frequency_Pitch
+                          </label>
+                          <span className="text-[10px] font-mono font-bold text-secondary uppercase">{settings.tts_pitch.toFixed(1)}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="2.0"
+                          step="0.1"
+                          value={settings.tts_pitch}
+                          onChange={(e) => handleSave('tts_pitch', parseFloat(e.target.value))}
+                          disabled={!settings.tts_enabled}
+                          className="w-full h-1 bg-surface rounded-full appearance-none cursor-pointer accent-secondary disabled:opacity-20"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </section>
 
-              <section>
-                <h3 className="text-lg font-semibold mb-4 text-primary">Keyboard Shortcuts</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Voice Activation Hotkey
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-accent">03 // User_Interface_Link</h3>
+                  <div className="flex-1 h-px bg-gradient-to-r from-accent/20 to-transparent"></div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                      Manual_activation_hotkey
                     </label>
-                    <input
-                      type="text"
-                      value={settings.hotkey}
-                      onChange={(e) => handleSave('hotkey', e.target.value)}
-                      placeholder="Ctrl+Shift+V"
-                      className="w-full px-4 py-2 rounded-lg bg-background border border-slate-600 text-text-primary focus:outline-none focus:border-primary"
-                    />
-                    <p className="text-xs text-text-secondary mt-1">
-                      Use format: Ctrl+Shift+Key or Alt+Key
+                    <div className="relative group">
+          <input
+            type="text"
+            value={settings.hotkey}
+            onChange={(e) => handleSave('hotkey', normalizeHotkey(e.target.value))}
+            placeholder="CTRL+SHIFT+V"
+                        className="w-full px-5 py-4 rounded-xl bg-background/50 border border-border text-text-primary font-mono text-sm focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all placeholder:opacity-20 shadow-inner group-hover:border-accent/30"
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent opacity-30 group-focus-within:opacity-100 group-focus-within:animate-pulse transition-all"></div>
+                      </div>
+                    </div>
+                    <p className="text-[8px] font-mono text-text-secondary uppercase mt-1 opacity-50 px-1 tracking-tighter">
+                      Supported modifiers: CTRL | SHIFT | ALT | SUPER
                     </p>
                   </div>
-                </div>
-              </section>
 
-              <section>
-                <h3 className="text-lg font-semibold mb-4 text-primary">Application</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="text-sm font-medium text-text-secondary">
-                        Auto-start
-                      </label>
-                      <p className="text-xs text-text-secondary">
-                        Start VoiceCode when you log in
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleToggle('auto_start')}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        settings.auto_start ? 'bg-primary' : 'bg-slate-600'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          settings.auto_start ? 'translate-x-6' : ''
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="text-sm font-medium text-text-secondary">
-                        Minimize to Tray
-                      </label>
-                      <p className="text-xs text-text-secondary">
-                        Keep running in system tray when closed
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleToggle('minimize_to_tray')}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        settings.minimize_to_tray ? 'bg-primary' : 'bg-slate-600'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          settings.minimize_to_tray ? 'translate-x-6' : ''
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="text-sm font-medium text-text-secondary">
-                        Always on Top
-                      </label>
-                      <p className="text-xs text-text-secondary">
-                        Keep window above other windows
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleToggle('always_on_top')}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        settings.always_on_top ? 'bg-primary' : 'bg-slate-600'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          settings.always_on_top ? 'translate-x-6' : ''
-                        }`}
-                      />
-                    </button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { key: 'auto_start' as const, label: 'Auto_Boot', sub: 'Initialize on login' },
+                      { key: 'minimize_to_tray' as const, label: 'Process_Persistence', sub: 'Continue in system tray' },
+                      { key: 'always_on_top' as const, label: 'Visual_Priority', sub: 'Lock window to foreground' },
+                    ].map((item) => (
+                      <div key={item.key} className="p-5 rounded-xl bg-surface/30 border border-border flex items-center justify-between group hover:border-accent/20 transition-all">
+                        <div className="flex flex-col">
+                          <label className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-widest group-hover:text-accent transition-colors">
+                            {item.label}
+                          </label>
+                          <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">{item.sub}</span>
+                        </div>
+                        <button
+                          onClick={() => handleToggle(item.key)}
+                          className={`relative w-10 h-5 rounded-full transition-all duration-300 border border-transparent ${settings[item.key] ? 'bg-accent shadow-[0_0_8px_rgba(var(--accent-rgb),0.4)]' : 'bg-surface border-border'
+                            }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${settings[item.key] ? 'translate-x-5' : 'opacity-20'
+                              }`}
+                          />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </section>
 
-              <section>
-                <h3 className="text-lg font-semibold mb-4 text-primary">Advanced</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Silence Threshold: {settings.silence_threshold.toFixed(1)}
-                    </label>
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-secondary">04 // Advanced_Synthetics</h3>
+                  <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent"></div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center px-1">
+                      <div className="flex flex-col">
+                        <label className="text-[9px] font-mono font-bold text-text-primary uppercase tracking-widest">
+                          Silence_Gate
+                        </label>
+                        <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Activation sensitivity</span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-text-primary uppercase">{settings.silence_threshold.toFixed(1)}</span>
+                    </div>
                     <input
                       type="range"
                       min="0.1"
@@ -364,17 +373,20 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       step="0.1"
                       value={settings.silence_threshold}
                       onChange={(e) => handleSave('silence_threshold', parseFloat(e.target.value))}
-                      className="w-full accent-primary"
+                      className="w-full h-1 bg-surface rounded-full appearance-none cursor-pointer accent-text-primary"
                     />
-                    <p className="text-xs text-text-secondary mt-1">
-                      Lower values are more sensitive to silence
-                    </p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                      Max Recording Duration: {settings.max_recording_duration}s
-                    </label>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center px-1">
+                      <div className="flex flex-col">
+                        <label className="text-[9px] font-mono font-bold text-text-primary uppercase tracking-widest">
+                          Buffer_Limit
+                        </label>
+                        <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Max capture duration</span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-text-primary uppercase">{settings.max_recording_duration}S</span>
+                    </div>
                     <input
                       type="range"
                       min="5"
@@ -382,7 +394,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       step="5"
                       value={settings.max_recording_duration}
                       onChange={(e) => handleSave('max_recording_duration', parseInt(e.target.value))}
-                      className="w-full accent-primary"
+                      className="w-full h-1 bg-surface rounded-full appearance-none cursor-pointer accent-text-primary"
                     />
                   </div>
                 </div>
@@ -391,12 +403,12 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-700 flex justify-end">
+        <div className="px-8 py-6 border-t border-border/50 bg-background/50 flex justify-end gap-4 shadow-inner">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-lg bg-primary text-white font-medium hover:opacity-90 transition-opacity"
+            className="px-8 py-3.5 rounded-xl bg-primary text-white font-mono font-bold text-[10px] uppercase tracking-[0.2em] shadow-neon hover:bg-primary/90 transition-all cursor-pointer active:scale-95"
           >
-            Close
+            Acknowledge_Commit
           </button>
         </div>
       </div>
