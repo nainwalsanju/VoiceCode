@@ -48,8 +48,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **CONV-01**: System detects when user has finished speaking (turn endpointing)
 - [ ] **CONV-02**: Continuous conversation without re-triggering between exchanges
 - [ ] **CONV-03**: Session state management (IDLE → LISTENING → PROCESSING → SPEAKING)
-- [ ] **CONV-04**: User can interrupt response mid-generation (barge-in)
-- [ ] **CONV-05**: TTS stops immediately when user starts speaking
+- [x] **CONV-04**: User can interrupt response mid-generation (barge-in)
+- [x] **CONV-05**: TTS stops immediately when user starts speaking
 
 ### Voice Cloning (All TTS Engines)
 
@@ -128,8 +128,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONV-01 | Phase 1 | Pending |
 | CONV-02 | Phase 2 | Pending |
 | CONV-03 | Phase 2 | Pending |
-| CONV-04 | Phase 3 | Pending |
-| CONV-05 | Phase 3 | Pending |
+| CONV-04 | Phase 3 | Complete |
+| CONV-05 | Phase 3 | Complete |
 | CLONE-01 | Phase 3 | Pending |
 | CLONE-02 | Phase 3 | Complete |
 | CLONE-03 | Phase 3 | Complete |

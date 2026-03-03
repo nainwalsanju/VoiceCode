@@ -79,6 +79,7 @@ progress:
 | Session state machine | Zustand store for IDLE→LISTENING→PROCESSING→SPEAKING→IDLE | ✅ Implemented |
 | Continuous conversation | Auto-return to LISTENING after SPEAKING | ✅ Implemented |
 | Global hotkey activation | Tauri global-shortcut plugin, toggle behavior | ✅ Implemented |
+| Barge-in detection | Volume threshold (0.3) with 50ms debounce for instant TTS interruption | ✅ Implemented |
 
 ### Technical Notes
 
