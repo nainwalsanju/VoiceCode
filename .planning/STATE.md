@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T20:56:01.902Z"
+last_updated: "2026-03-03T18:11:25.120Z"
 progress:
-  total_phases: 3
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 4
+  total_phases: 4
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 7
 ---
 
 # VoiceCode State
@@ -27,10 +27,10 @@ progress:
 
 | Attribute | Value |
 |-----------|-------|
-| **Phase** | 2 - Full Conversation Pipeline |
-| **Plan** | 02-03 |
+| **Phase** | 3 - Conversation Flow & Voice Features |
+| **Plan** | 03-03 |
 | **Status** | Completed |
-| **Progress** | 100% (3/3 plans) |
+| **Progress** | 33% (1/3 plans) |
 
 ---
 
@@ -40,7 +40,7 @@ progress:
 |-------|------|-------|--------|-----------|
 | 1 | Core Audio Pipeline | 3/3 | ✅ Complete | 11 tasks |
 | 2 | Full Conversation Pipeline | 3/3 | ✅ Complete | 3 plans |
-| 3 | Conversation Flow & Voice Features | 0/3 | Not started | - |
+| 3 | Conversation Flow & Voice Features | 1/3 | 🔄 In Progress | Plan 01 complete |
 | 4 | Polish & Desktop Integration | 0/2 | Not started | - |
 
 ---
@@ -55,6 +55,9 @@ progress:
 | Requirement coverage | 100% | 34/34 ✓ |
 
 ---
+| Phase 03 P02 | 20min | 3 tasks | 3 files |
+| Phase 03-conversation-flow-voice-features P01 | 26min | 3 tasks | 6 files |
+| Phase 03-conversation-flow-voice-features P03 | 24 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -75,6 +78,7 @@ progress:
 | httpx for async HTTP | Lighter than OpenAI SDK | ✅ Implemented |
 | Session state machine | Zustand store for IDLE→LISTENING→PROCESSING→SPEAKING→IDLE | ✅ Implemented |
 | Continuous conversation | Auto-return to LISTENING after SPEAKING | ✅ Implemented |
+| Global hotkey activation | Tauri global-shortcut plugin, toggle behavior | ✅ Implemented |
 
 ### Technical Notes
 

@@ -54,8 +54,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Voice Cloning (All TTS Engines)
 
 - [ ] **CLONE-01**: User can upload audio sample (2-15 seconds) to clone voice
-- [ ] **CLONE-02**: Cloned voice is available immediately for TTS output
-- [ ] **CLONE-03**: Multiple cloned voices can be saved and selected
+- [x] **CLONE-02**: Cloned voice is available immediately for TTS output
+- [x] **CLONE-03**: Multiple cloned voices can be saved and selected
 - [ ] **CLONE-04**: Voice cloning works with all supported TTS engines
 
 ### User Interface
@@ -63,7 +63,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UI-01**: Push-to-talk or voice activation toggle
 - [ ] **UI-02**: Visual indicator showing current state (listening, processing, speaking)
 - [x] **UI-03**: Transcript display showing conversation history
-- [ ] **UI-04**: Voice selection dropdown with preview capability
+- [x] **UI-04**: Voice selection dropdown with preview capability
 - [ ] **UI-05**: Settings panel for voice cloning and preferences
 
 ### Desktop Integration
@@ -131,13 +131,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONV-04 | Phase 3 | Pending |
 | CONV-05 | Phase 3 | Pending |
 | CLONE-01 | Phase 3 | Pending |
-| CLONE-02 | Phase 3 | Pending |
-| CLONE-03 | Phase 3 | Pending |
+| CLONE-02 | Phase 3 | Complete |
+| CLONE-03 | Phase 3 | Complete |
 | CLONE-04 | Phase 3 | Pending |
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
 | UI-03 | Phase 2 | Complete |
-| UI-04 | Phase 3 | Pending |
+| UI-04 | Phase 3 | Complete |
 | UI-05 | Phase 3 | Pending |
 | DESK-01 | Phase 1 | Pending |
 | DESK-02 | Phase 4 | Pending |
