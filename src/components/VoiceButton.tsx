@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSessionStore, SessionState } from '../stores/sessionStore';
 import { useTranscriptStore } from '../stores/transcriptStore';
+import { registerGlobalHotkey, unregisterGlobalHotkey } from '../hooks/useGlobalHotkey';
+import { getSettings } from '../api/settings';
 
 interface VoiceButtonProps {
   onTranscript?: (text: string) => void;
@@ -12,6 +14,7 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
   const [error, setError] = useState<string | null>(null);
   const [wsSessionState, setWsSessionState] = useState<SessionState>('IDLE');
   const [isConnecting, setIsConnecting] = useState(false);
+  const [hotkeyActivated, setHotkeyActivated] = useState(false);
   
   // Use session store for state management
   const { 
@@ -267,6 +270,45 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
     };
   }, [stopInteraction]);
 
+  // Register global hotkey on mount
+  useEffect(() => {
+    let cleanup: (() => void) | null = null;
+
+    const setupHotkey = async () => {
+      try {
+        const settings = await getSettings();
+        const hotkey = settings.hotkey || 'Ctrl+Shift+V';
+
+        const handleHotkeyActivation = () => {
+          setHotkeyActivated(true);
+          setTimeout(() => setHotkeyActivated(false), 500);
+
+          const currentState = useSessionStore.getState().currentState;
+
+          if (currentState === 'IDLE') {
+            startInteraction();
+          } else {
+            stopInteraction();
+          }
+        };
+
+        await registerGlobalHotkey(hotkey, handleHotkeyActivation);
+
+        cleanup = () => {
+          unregisterGlobalHotkey(hotkey);
+        };
+      } catch (error) {
+        console.error('Failed to setup hotkey:', error);
+      }
+    };
+
+    setupHotkey().catch(console.error);
+
+    return () => {
+      cleanup?.();
+    };
+  }, [startInteraction, stopInteraction]);
+
   // Get state label based on current state
   const getStateLabel = () => {
     if (error) return error || 'Core Failure';
@@ -294,17 +336,23 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
           }`}></div>
 
         <button
-          className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer isolation-auto z-10
+          className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer isolation-auto z-10 
             ${status === 'listening' ? 'bg-secondary ring-4 ring-secondary/30 shadow-[0_0_50px_rgba(139,92,246,0.6)] scale-110' :
               status === 'speaking' ? 'bg-accent shadow-[0_0_40px_rgba(16,185,129,0.5)] animate-pulse' :
-                status === 'error' ? 'bg-error shadow-[0_0_30px_rgba(239,68,68,0.5)]' :
-                  'bg-surface border-2 border-border hover:border-primary/50 hover:shadow-neon'}
+              status === 'error' ? 'bg-error shadow-[0_0_30px_rgba(239,68,68,0.5)]' :
+              'bg-surface border-2 border-border hover:border-primary/50 hover:shadow-neon'}
             ${isProcessing || status === 'connecting' ? 'opacity-50 cursor-wait' : ''}
+            ${hotkeyActivated ? 'ring-4 ring-primary/50 scale-110' : ''}
           `}
           onClick={toggleRecording}
-          disabled={isProcessing || status === 'connecting'}
+        disabled={isProcessing || status === 'connecting'}
         >
-          {/* Animated Spectral Rings for Listening */}
+        {/* Hotkey activation flash */}
+        {hotkeyActivated && (
+          <div className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />
+        )}
+        
+        {/* Animated Spectral Rings for Listening */}
           {status === 'listening' && (
             <div className="absolute inset-0 z-0">
               {[...Array(3)].map((_, i) => (
