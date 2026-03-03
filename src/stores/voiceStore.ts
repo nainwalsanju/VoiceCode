@@ -12,9 +12,12 @@ interface VoiceState {
   selectedVoice: string;
   defaultVoice: string;
   voices: Voice[];
+  previewingVoiceId: string | null;
   setSelectedVoice: (voiceId: string) => void;
   setDefaultVoice: (voiceId: string) => void;
   loadVoices: () => void;
+  startPreview: (voiceId: string) => void;
+  stopPreview: () => void;
 }
 
 // Map tts_service AVAILABLE_VOICES to Voice[]
@@ -46,6 +49,7 @@ export const useVoiceStore = create<VoiceState>()(
       selectedVoice: '',
       defaultVoice: 'qwen3-tts-0.6b',
       voices: AVAILABLE_VOICES_MAP,
+      previewingVoiceId: null,
 
       setSelectedVoice: (voiceId: string) => {
         set({ selectedVoice: voiceId });
@@ -67,6 +71,14 @@ export const useVoiceStore = create<VoiceState>()(
         if (!selectedVoice && defaultVoice) {
           set({ selectedVoice: defaultVoice });
         }
+      },
+
+      startPreview: (voiceId: string) => {
+        set({ previewingVoiceId: voiceId });
+      },
+
+      stopPreview: () => {
+        set({ previewingVoiceId: null });
       },
     }),
     {
