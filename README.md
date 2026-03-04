@@ -1,14 +1,14 @@
 # VoiceCode 🎤
 
-A cross-platform voice coding application that enables developers to write code using voice commands, with TTS feedback and voice cloning capabilities.
+A cross-platform voice coding application built on a **Multi-Agent Conversational Matrix**. It enables developers to dictate code, clone neural voices, and seamlessly route tasks to distinct AI unities with independent states.
 
-## Features
+## Capabilities (v2.0)
 
-- **Voice Dictation** - Speak and your words appear as text
-- **Text-to-Speech (TTS)** - Hear your code read aloud with Edge TTS
-- **Voice Cloning** - Create custom voices from audio samples using Pocket TTS
-- **Voice Commands** - Define custom voice commands via UI
-- **Modern UI** - Beautiful glassmorphism interface
+- **Multi-Agent Orchestration** - Forge discrete personas, map them to unique LLM system prompts, and seamlessly converse via a custom routing engine.
+- **Neural Voice Cloning** - Clone custom target voices (using `pocket-tts`) and bind them dynamically to your agents.
+- **Streaming Voice I/O** - Ultra-low latency dictation and text-to-speech loops built natively over async websockets.
+- **Micro-Macro Execution** - Define custom voice hotkeys and commands natively.
+- **Glassmorphism Interface** - A polished, cyberpunk-inspired dark mode UI.
 
 ## Tech Stack
 
