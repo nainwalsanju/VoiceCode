@@ -105,7 +105,7 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-        <label htmlFor="voice-name" className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+        <label htmlFor="voice-name" className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider pl-1 opacity-90">
           Neural_Identity_Label
         </label>
         <input
@@ -120,13 +120,13 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
       </div>
 
       <div className="flex flex-col gap-3">
-        <label className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">Acoustic_Vector_Input</label>
+        <label className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider pl-1 opacity-90">Acoustic_Vector_Input</label>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {recording ? (
             <button
               type="button"
-              className="w-full py-3.5 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-widest bg-error text-white shadow-lg shadow-error/20 transition-all flex items-center justify-center gap-3 cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-error text-white shadow-lg shadow-error/20 transition-all flex items-center justify-center gap-3 cursor-pointer"
               onClick={stopRecording}
             >
               <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
@@ -135,14 +135,14 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
           ) : (
             <button
               type="button"
-              className="w-full py-3.5 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-widest bg-primary text-white shadow-neon hover:bg-primary/90 transition-all flex items-center justify-center gap-3 cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-primary text-white shadow-neon hover:bg-primary/90 transition-all flex items-center justify-center gap-3 cursor-pointer"
               onClick={startRecording}
             >
               🎤 Capture Sample
             </button>
           )}
 
-          <label className="w-full py-3.5 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-widest bg-surface/50 text-text-secondary border border-border hover:bg-surface hover:text-text-primary hover:border-text-secondary/30 transition-all flex items-center justify-center gap-3 cursor-pointer shadow-sm">
+          <label className="w-full py-3.5 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-surface/50 text-text-secondary border border-border hover:bg-surface hover:text-text-primary hover:border-text-secondary/30 transition-all flex items-center justify-center gap-3 cursor-pointer shadow-sm">
             📁 Inject Stream
             <input
               type="file"
@@ -157,7 +157,7 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
         {audioUrl && (
           <div className="mt-2 p-5 bg-primary/5 border border-primary/20 rounded-xl space-y-4 animate-in fade-in zoom-in-95 duration-500">
             <audio src={audioUrl} controls className="w-full h-8 opacity-70 contrast-125 saturate-50" />
-            <div className="flex items-center gap-3 text-[10px] font-mono text-primary font-bold uppercase tracking-widest">
+            <div className="flex items-center gap-3 text-xs font-mono text-primary font-bold uppercase tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               {audioFile?.name || 'Vocal_Source_Ready'}
             </div>
@@ -166,7 +166,7 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
       </div>
 
       {error && (
-        <div className="bg-error/10 border border-error/20 text-error p-4 rounded-xl text-[10px] font-mono font-bold uppercase tracking-tight flex items-center gap-3">
+        <div className="bg-error/10 border border-error/20 text-error p-4 rounded-xl text-xs font-mono font-bold uppercase tracking-tight flex items-center gap-3">
           <span className="w-1.5 h-1.5 rounded-full bg-error animate-ping shrink-0"></span>
           {error}
         </div>
@@ -175,7 +175,7 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
       <div className="flex items-center gap-4 pt-4 border-t border-border mt-2">
         <button
           type="button"
-          className="flex-1 py-3.5 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-[0.2em] bg-surface/50 text-text-secondary border border-border hover:bg-surface hover:text-text-primary transition-all cursor-pointer"
+          className="flex-1 py-3.5 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-surface/50 text-text-secondary border border-border hover:bg-surface hover:text-text-primary transition-all cursor-pointer"
           onClick={handleClear}
           disabled={loading}
         >
@@ -183,7 +183,7 @@ export function VoiceCloneForm({ onSuccess }: VoiceCloneFormProps) {
         </button>
         <button
           type="submit"
-          className="flex-1 py-3.5 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-[0.2em] bg-accent text-white shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="flex-1 py-3.5 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-accent text-white shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           disabled={loading || !name || !audioFile}
         >
           {loading ? 'Synthesizing...' : 'Initialize Clone'}

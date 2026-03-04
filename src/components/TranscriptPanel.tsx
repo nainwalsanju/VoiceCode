@@ -4,10 +4,10 @@ import { useTranscriptStore, Message } from '../stores/transcriptStore';
 // Format timestamp to HH:MM
 const formatTime = (timestamp: number): string => {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString('en-US', { 
-    hour: '2-digit', 
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
     minute: '2-digit',
-    hour12: false 
+    hour12: false
   });
 };
 
@@ -21,8 +21,8 @@ const MessageBubble = ({ message }: { message: Message }) => {
         {/* Role icon */}
         <div className={`
           flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center
-          ${isUser 
-            ? 'bg-secondary/20 border border-secondary/30' 
+          ${isUser
+            ? 'bg-secondary/20 border border-secondary/30'
             : 'bg-primary/20 border border-primary/30'
           }
         `}>
@@ -40,19 +40,18 @@ const MessageBubble = ({ message }: { message: Message }) => {
         {/* Message content */}
         <div className={`
           flex flex-col gap-1 p-3 rounded-xl
-          ${isUser 
-            ? 'bg-secondary/10 border border-secondary/20' 
+          ${isUser
+            ? 'bg-secondary/10 border border-secondary/20'
             : 'bg-primary/10 border border-primary/20'
           }
         `}>
-          <p className={`text-xs font-mono leading-relaxed break-words ${
-            isUser ? 'text-text-primary' : 'text-text-primary'
-          }`}>
+          <p className={`text-xs font-mono leading-relaxed break-words ${isUser ? 'text-text-primary' : 'text-text-primary'
+            }`}>
             {message.content}
           </p>
           <span className={`
-            text-[9px] font-mono uppercase tracking-wider self-end
-            ${isUser ? 'text-secondary/60' : 'text-primary/60'}
+            text-[10px] font-mono uppercase tracking-wide opacity-70 self-end
+            ${isUser ? 'text-secondary' : 'text-primary'}
           `}>
             {formatTime(message.timestamp)}
           </span>
@@ -87,20 +86,20 @@ export function TranscriptPanel({ className = '' }: TranscriptPanelProps) {
             <div className="w-2.5 h-2.5 rounded-full bg-accent/40 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
             <div className="w-2.5 h-2.5 rounded-full bg-secondary/40 shadow-[0_0_8px_rgba(168,85,247,0.3)]"></div>
           </div>
-          <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-primary uppercase opacity-80">
+          <h3 className="text-xs font-mono font-bold tracking-widest text-text-primary uppercase opacity-80">
             Conversation_Log
           </h3>
           {messages.length > 0 && (
-            <span className="text-[9px] font-mono text-text-secondary ml-2">
+            <span className="text-xs font-mono text-text-secondary opacity-80 ml-2">
               ({messages.length} messages)
             </span>
           )}
         </div>
-        
+
         {messages.length > 0 && (
           <button
             onClick={clearTranscript}
-            className="px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-text-secondary hover:text-error transition-colors cursor-pointer border border-transparent hover:border-error/20 rounded-md bg-surface/30"
+            className="px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wide text-text-secondary hover:text-error transition-colors cursor-pointer border border-transparent hover:border-error/20 rounded-md bg-surface/30"
           >
             Clear
           </button>
@@ -108,7 +107,7 @@ export function TranscriptPanel({ className = '' }: TranscriptPanelProps) {
       </div>
 
       {/* Messages container */}
-      <div 
+      <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto min-h-[200px] max-h-[400px] px-2"
       >
@@ -117,10 +116,10 @@ export function TranscriptPanel({ className = '' }: TranscriptPanelProps) {
             <svg className="w-12 h-12 text-text-secondary/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <p className="text-[10px] font-mono text-text-secondary/40 italic">
+            <p className="text-xs font-mono text-text-secondary italic opacity-70">
               Conversation will appear here
             </p>
-            <p className="text-[9px] font-mono text-text-secondary/30 mt-2">
+            <p className="text-xs font-mono text-text-secondary opacity-70 mt-2">
               Start speaking to begin
             </p>
           </div>
@@ -138,15 +137,15 @@ export function TranscriptPanel({ className = '' }: TranscriptPanelProps) {
         <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[7px] font-mono text-text-secondary uppercase opacity-40">Session_Status</span>
-              <span className="text-[9px] font-mono text-accent font-bold uppercase tracking-tighter">
+              <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70 tracking-wide">Session_Status</span>
+              <span className="text-[10px] font-mono text-accent font-bold uppercase tracking-tight">
                 Active // {messages.length} exchanges
               </span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>
-            <span className="text-[8px] font-mono text-text-secondary uppercase opacity-60">
+            <span className="text-[10px] font-mono text-text-secondary uppercase opacity-80">
               Live
             </span>
           </div>

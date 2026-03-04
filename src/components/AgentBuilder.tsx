@@ -138,8 +138,8 @@ export function AgentBuilder() {
                                     <h4 className="font-mono text-sm uppercase tracking-wider font-bold text-text-primary">{agent.name}</h4>
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleEdit(agent)} className="text-[10px] uppercase font-mono tracking-widest text-accent hover:text-white">Edit</button>
-                                    <button onClick={() => handleDelete(agent.id)} className="text-[10px] uppercase font-mono tracking-widest text-error hover:text-white">Delete</button>
+                                    <button onClick={() => handleEdit(agent)} className="text-xs uppercase font-mono tracking-wider text-accent hover:text-white">Edit</button>
+                                    <button onClick={() => handleDelete(agent.id)} className="text-xs uppercase font-mono tracking-wider text-error hover:text-white">Delete</button>
                                 </div>
                             </div>
                             <div className="text-xs font-mono text-text-secondary opacity-60 ml-6">

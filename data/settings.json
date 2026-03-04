@@ -1,7 +1,7 @@
 {
   "stt_provider": "google",
   "tts_voice": "en-US-Neural2-M",
-  "tts_speed": 1,
+  "tts_speed": 1.2,
   "tts_pitch": 1.0,
   "microphone": "",
   "hotkey": "Ctrl+Shift+V",

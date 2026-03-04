@@ -114,7 +114,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         <div className="flex items-center justify-between px-8 py-6 border-b border-border/50">
           <div>
             <h2 className="text-sm font-mono font-bold uppercase tracking-[0.3em] text-text-primary">System_Core_Config</h2>
-            <p className="text-[10px] font-mono text-text-secondary uppercase opacity-50 mt-1">Adjust neural parameters & interface</p>
+            <p className="text-xs font-mono text-text-secondary uppercase opacity-70 tracking-wider mt-1">Adjust neural parameters & interface</p>
           </div>
           <button
             onClick={onClose}
@@ -130,7 +130,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
           {loading && (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <div className="animate-spin w-10 h-10 border-2 border-primary border-t-transparent rounded-full shadow-neon"></div>
-              <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-secondary uppercase animate-pulse">Scanning Registry...</span>
+              <span className="text-xs font-mono font-bold tracking-wider text-text-secondary uppercase opacity-80 animate-pulse">Scanning Registry...</span>
             </div>
           )}
 
@@ -145,13 +145,13 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
             <div className="space-y-10">
               <section className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">01 // Acoustic_Vocal_Capture</h3>
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-primary">01 // Acoustic_Vocal_Capture</h3>
                   <div className="flex-1 h-px bg-gradient-to-r from-primary/20 to-transparent"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                    <label className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider opacity-80 pl-1">
                       Link_Provider
                     </label>
                     <select
@@ -166,7 +166,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                    <label className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider opacity-80 pl-1">
                       Acoustic_Source
                     </label>
                     <select
@@ -185,7 +185,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                  <label className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider opacity-80 pl-1">
                     Language_Set
                   </label>
                   <select
@@ -206,17 +206,17 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
               <section className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-secondary">02 // Vocal_Synthesis</h3>
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-secondary">02 // Vocal_Synthesis</h3>
                   <div className="flex-1 h-px bg-gradient-to-r from-secondary/20 to-transparent"></div>
                 </div>
 
                 <div className="bg-surface/30 border border-border rounded-xl p-6 space-y-6 shadow-inner">
                   <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <label className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-widest">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-mono font-bold text-text-primary uppercase tracking-widest">
                         Initialize_Synthesis
                       </label>
-                      <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Master switch for audio feedback</span>
+                      <span className="text-xs font-mono text-text-secondary uppercase opacity-70">Master switch for audio feedback</span>
                     </div>
                     <button
                       onClick={() => handleToggle('tts_enabled')}
@@ -232,7 +232,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
                   <div className="space-y-6 pt-4 border-t border-border/30 opacity-100 transition-opacity">
                     <div className="space-y-2 opacity-100">
-                      <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                      <label className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider opacity-80 pl-1">
                         Neural_Voice_Model
                       </label>
                       <select
@@ -252,10 +252,10 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-4">
                         <div className="flex justify-between items-center px-1">
-                          <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest">
+                          <label className="text-xs font-mono font-bold opacity-80 text-text-secondary uppercase tracking-wider">
                             Tempo_Scalar
                           </label>
-                          <span className="text-[10px] font-mono font-bold text-secondary uppercase">{settings.tts_speed.toFixed(1)}x</span>
+                          <span className="text-xs font-mono font-bold text-secondary uppercase">{settings.tts_speed.toFixed(1)}x</span>
                         </div>
                         <input
                           type="range"
@@ -271,10 +271,10 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
                       <div className="space-y-4">
                         <div className="flex justify-between items-center px-1">
-                          <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest">
+                          <label className="text-xs font-mono font-bold opacity-80 text-text-secondary uppercase tracking-wider">
                             Frequency_Pitch
                           </label>
-                          <span className="text-[10px] font-mono font-bold text-secondary uppercase">{settings.tts_pitch.toFixed(1)}</span>
+                          <span className="text-xs font-mono font-bold text-secondary uppercase">{settings.tts_pitch.toFixed(1)}</span>
                         </div>
                         <input
                           type="range"
@@ -294,13 +294,13 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
               <section className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-accent">03 // User_Interface_Link</h3>
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-accent">03 // User_Interface_Link</h3>
                   <div className="flex-1 h-px bg-gradient-to-r from-accent/20 to-transparent"></div>
                 </div>
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+                    <label className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider opacity-80 pl-1">
                       Manual_activation_hotkey
                     </label>
                     <div className="relative group">
@@ -315,7 +315,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                         <div className="w-1.5 h-1.5 rounded-full bg-accent opacity-30 group-focus-within:opacity-100 group-focus-within:animate-pulse transition-all"></div>
                       </div>
                     </div>
-                    <p className="text-[8px] font-mono text-text-secondary uppercase mt-1 opacity-50 px-1 tracking-tighter">
+                    <p className="text-xs font-mono text-text-secondary uppercase mt-1 opacity-70 tracking-wider px-1">
                       Supported modifiers: CTRL | SHIFT | ALT | SUPER
                     </p>
                   </div>
@@ -327,11 +327,11 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       { key: 'always_on_top' as const, label: 'Visual_Priority', sub: 'Lock window to foreground' },
                     ].map((item) => (
                       <div key={item.key} className="p-5 rounded-xl bg-surface/30 border border-border flex items-center justify-between group hover:border-accent/20 transition-all">
-                        <div className="flex flex-col">
-                          <label className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-widest group-hover:text-accent transition-colors">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-sm font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-accent transition-colors">
                             {item.label}
                           </label>
-                          <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">{item.sub}</span>
+                          <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70">{item.sub}</span>
                         </div>
                         <button
                           onClick={() => handleToggle(item.key)}
@@ -351,20 +351,20 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
               <section className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-secondary">04 // Advanced_Synthetics</h3>
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-text-secondary">04 // Advanced_Synthetics</h3>
                   <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center px-1">
-                      <div className="flex flex-col">
-                        <label className="text-[9px] font-mono font-bold text-text-primary uppercase tracking-widest">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-xs font-mono font-bold text-text-primary uppercase tracking-wider">
                           Silence_Gate
                         </label>
-                        <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Activation sensitivity</span>
+                        <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70">Activation sensitivity</span>
                       </div>
-                      <span className="text-[10px] font-mono font-bold text-text-primary uppercase">{settings.silence_threshold.toFixed(1)}</span>
+                      <span className="text-xs font-mono font-bold text-text-primary uppercase">{settings.silence_threshold.toFixed(1)}</span>
                     </div>
                     <input
                       type="range"
@@ -379,13 +379,13 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
                   <div className="space-y-4">
                     <div className="flex justify-between items-center px-1">
-                      <div className="flex flex-col">
-                        <label className="text-[9px] font-mono font-bold text-text-primary uppercase tracking-widest">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-xs font-mono font-bold text-text-primary uppercase tracking-wider">
                           Buffer_Limit
                         </label>
-                        <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Max capture duration</span>
+                        <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70">Max capture duration</span>
                       </div>
-                      <span className="text-[10px] font-mono font-bold text-text-primary uppercase">{settings.max_recording_duration}S</span>
+                      <span className="text-xs font-mono font-bold text-text-primary uppercase">{settings.max_recording_duration}S</span>
                     </div>
                     <input
                       type="range"
@@ -406,7 +406,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         <div className="px-8 py-6 border-t border-border/50 bg-background/50 flex justify-end gap-4 shadow-inner">
           <button
             onClick={onClose}
-            className="px-8 py-3.5 rounded-xl bg-primary text-white font-mono font-bold text-[10px] uppercase tracking-[0.2em] shadow-neon hover:bg-primary/90 transition-all cursor-pointer active:scale-95"
+            className="px-8 py-3.5 rounded-xl bg-primary text-white font-mono font-bold text-xs uppercase tracking-widest shadow-neon hover:bg-primary/90 transition-all cursor-pointer active:scale-95"
           >
             Acknowledge_Commit
           </button>

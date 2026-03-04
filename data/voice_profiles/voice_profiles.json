@@ -6,5 +6,13 @@
     "is_default": false,
     "created_at": "2026-02-23T09:17:45.903344",
     "audio_sample_path": "/Users/sanju/Projects/voicecode/data/audio_samples/0d23368b-19e0-4905-8cdc-622d191efee8.wav"
+  },
+  {
+    "id": "162080c0-d3b9-47ad-a95c-6872a9848efd",
+    "name": "Aria CloneAria Clone",
+    "voice_id": "90258727-a59d-4155-ba02-f4b70d298414",
+    "is_default": false,
+    "created_at": "2026-03-04T21:24:35.165562",
+    "audio_sample_path": "C:\\Users\\Sanjay\\Desktop\\Projects\\VoiceCode\\data\\audio_samples\\90258727-a59d-4155-ba02-f4b70d298414.wav"
   }
 ]

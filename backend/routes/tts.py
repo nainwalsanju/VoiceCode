@@ -48,6 +48,30 @@ async def generate_tts(request: TTSRequest):
         raise HTTPException(status_code=500, detail=f"TTS generation failed: {str(e)}")
 
 
+@router.post("/preview")
+async def preview_tts(request: TTSRequest):
+    """Generate audio snippet for voice preview."""
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+    try:
+        tts_service = get_tts_service()
+        voice_to_use = request.voice_id if request.voice_id else request.voice
+        
+        audio_bytes, _ = await tts_service.generate_audio_async(
+            text=request.text, voice=voice_to_use
+        )
+
+        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+        return {"audio": audio_base64}
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS preview failed: {str(e)}")
+
+
+
 async def audio_stream_generator(
     text: str, voice: str, voice_id: str | None, rate: str
 ):

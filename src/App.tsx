@@ -60,7 +60,7 @@ function App() {
               </h1>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
-                <p className="text-[10px] font-mono font-bold text-text-secondary uppercase opacity-50">Pulse_Active</p>
+                <p className="text-xs font-mono font-bold text-text-secondary uppercase opacity-80">Pulse_Active</p>
               </div>
             </div>
           </div>
@@ -84,11 +84,11 @@ function App() {
                 : "text-text-secondary hover:bg-surface hover:text-text-primary border border-transparent hover:border-border/50"
                 }`}
             >
-              <span className={`text-[8px] font-mono font-bold mb-1 opacity-50 ${currentView === item.id ? 'text-white' : 'text-primary'}`}>
+              <span className={`text-xs font-mono font-bold mb-1 opacity-70 ${currentView === item.id ? 'text-white' : 'text-primary'}`}>
                 {item.id.toUpperCase()}_LINK // {item.icon}
               </span>
-              <div className="font-mono font-bold text-[11px] uppercase tracking-widest">{item.label}</div>
-              <div className={`text-[9px] font-mono leading-tight opacity-40 mt-1 ${currentView === item.id ? 'text-white' : 'text-text-secondary'}`}>
+              <div className="font-mono font-bold text-sm uppercase tracking-wider">{item.label}</div>
+              <div className={`text-xs font-mono leading-tight opacity-70 mt-1 ${currentView === item.id ? 'text-white' : 'text-text-secondary'}`}>
                 {item.desc}
               </div>
               {currentView === item.id && (
@@ -107,7 +107,7 @@ function App() {
               { label: "Buffer_Cap", val: 12, color: "bg-secondary" },
             ].map((metric) => (
               <div key={metric.label} className="space-y-1.5">
-                <div className="flex justify-between text-[8px] font-mono font-bold uppercase tracking-tighter opacity-50">
+                <div className="flex justify-between text-xs font-mono font-bold uppercase tracking-tight opacity-80">
                   <span>{metric.label}</span>
                   <span>{metric.val}%</span>
                 </div>
@@ -121,7 +121,7 @@ function App() {
             ))}
           </div>
           <div className="pt-2 flex items-center justify-between">
-            <div className="text-[8px] font-mono text-text-secondary opacity-30 uppercase tracking-[0.2em]">Uplink_Secure</div>
+            <div className="text-xs font-mono text-text-secondary opacity-70 uppercase tracking-wider">Uplink_Secure</div>
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
           </div>
         </div>
@@ -143,7 +143,7 @@ function App() {
                 {currentView === "test" && "Neural_Diagnostic_Array"}
                 {currentView === "chat" && "Multi_Agent_Comm_Matrix"}
               </h2>
-              <p className="text-[10px] font-mono text-text-secondary uppercase opacity-40 mt-1.5 tracking-[0.2em]">
+              <p className="text-sm font-mono text-text-secondary uppercase opacity-80 mt-1.5 tracking-wider">
                 {currentView === "dictate" && "Mode: Real-time_Neural_Capture // Status: Active"}
                 {currentView === "voices" && "Mode: Identity_Relink // Status: Secure"}
                 {currentView === "commands" && "Mode: Protocol_Registry_V2 // Status: Ready"}
@@ -168,16 +168,16 @@ function App() {
               </button>
               <div className="flex items-center gap-2.5 px-4 py-3 bg-surface/80 rounded-xl border border-border transition-all duration-300 shadow-md">
                 {isLoading ? (
-                  <span className="text-[10px] font-mono font-bold text-text-secondary animate-pulse px-2">PINGING...</span>
+                  <span className="text-xs font-mono font-bold text-text-secondary animate-pulse px-2">PINGING...</span>
                 ) : isConnected ? (
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(var(--accent-rgb),0.6)]"></span>
-                    <span className="text-[10px] font-mono font-bold text-accent tracking-tighter uppercase">Link_Established</span>
+                    <span className="text-xs font-mono font-bold text-accent tracking-tight uppercase">Link_Established</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-error shadow-[0_0_8px_rgba(var(--error-rgb),0.6)]"></span>
-                    <span className="text-[10px] font-mono font-bold text-error tracking-tighter uppercase">Link_Severed</span>
+                    <span className="text-xs font-mono font-bold text-error tracking-tight uppercase">Link_Severed</span>
                   </div>
                 )}
               </div>
@@ -197,8 +197,8 @@ function App() {
                 </div>
                 <div className="col-span-1">
                   <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-secondary/30 h-[600px] overflow-y-auto">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Orchestrator_Link</div>
-                    <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Agent_Forge</h3>
+                    <div className="absolute top-0 right-0 p-4 opacity-40 font-mono text-xs tracking-tight uppercase pointer-events-none">Orchestrator_Link</div>
+                    <h3 className="text-sm font-mono font-bold uppercase tracking-wider mb-6 text-text-secondary opacity-90">Agent_Forge</h3>
                     <AgentBuilder />
                   </div>
                 </div>
@@ -226,13 +226,13 @@ function App() {
             {currentView === "voices" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
                 <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-primary/30">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Link_Storage_01</div>
-                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Authenticated_Identities</h3>
+                  <div className="absolute top-0 right-0 p-4 opacity-40 font-mono text-xs tracking-tight uppercase pointer-events-none">Link_Storage_01</div>
+                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider mb-6 text-text-secondary opacity-90">Authenticated_Identities</h3>
                   <VoiceProfileList />
                 </div>
                 <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-secondary/30">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Clone_Interface_04</div>
-                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Neural_Identity_Cloning</h3>
+                  <div className="absolute top-0 right-0 p-4 opacity-40 font-mono text-xs tracking-tight uppercase pointer-events-none">Clone_Interface_04</div>
+                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider mb-6 text-text-secondary opacity-90">Neural_Identity_Cloning</h3>
                   <VoiceCloneForm />
                 </div>
               </div>
@@ -241,13 +241,13 @@ function App() {
             {currentView === "commands" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
                 <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-primary/30">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Protocol_Dump_02</div>
-                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Active_Link_Protocols</h3>
+                  <div className="absolute top-0 right-0 p-4 opacity-40 font-mono text-xs tracking-tight uppercase pointer-events-none">Protocol_Dump_02</div>
+                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider mb-6 text-text-secondary opacity-90">Active_Link_Protocols</h3>
                   <CommandList />
                 </div>
                 <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-secondary/30">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Registry_Forge_07</div>
-                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Protocol_Forge_Interface</h3>
+                  <div className="absolute top-0 right-0 p-4 opacity-40 font-mono text-xs tracking-tight uppercase pointer-events-none">Registry_Forge_07</div>
+                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider mb-6 text-text-secondary opacity-90">Protocol_Forge_Interface</h3>
                   <CommandForm />
                 </div>
               </div>
@@ -255,8 +255,8 @@ function App() {
 
             {currentView === "test" && (
               <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-accent/30">
-                <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Diagnostic_Core_09</div>
-                <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Neural_Feedback_Diagnostics</h3>
+                <div className="absolute top-0 right-0 p-4 opacity-40 font-mono text-xs tracking-tight uppercase pointer-events-none">Diagnostic_Core_09</div>
+                <h3 className="text-sm font-mono font-bold uppercase tracking-wider mb-6 text-text-secondary opacity-90">Neural_Feedback_Diagnostics</h3>
                 <CommandTester />
               </div>
             )}
@@ -265,19 +265,19 @@ function App() {
 
         <footer className="px-8 py-4 border-t border-border/30 bg-background/20 backdrop-blur-xl">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-[9px] font-mono uppercase tracking-widest text-text-secondary opacity-40">
+            <div className="flex items-center gap-4 text-xs font-mono uppercase tracking-wider text-text-secondary opacity-70">
               <span className="flex items-center gap-1.5">
-                <span className="w-1 h-1 rounded-full bg-primary"></span>
+                <span className="w-2 h-2 rounded-full bg-primary"></span>
                 CORE_BUILD_v0.9.4_RC
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-1 h-1 rounded-full bg-accent"></span>
+                <span className="w-2 h-2 rounded-full bg-accent"></span>
                 UPLINK_STABLE
               </span>
             </div>
-            <div className="flex items-center gap-4 text-[9px] font-mono text-text-secondary opacity-30 hover:opacity-100 transition-opacity uppercase tracking-tighter">
+            <div className="flex items-center gap-4 text-xs font-mono text-text-secondary opacity-70 hover:opacity-100 transition-opacity uppercase tracking-tight">
               <span>Hyper-optimized Neural Processing Core</span>
-              <span className="h-3 w-px bg-border"></span>
+              <span className="h-4 w-px bg-border"></span>
               <span>Proprietary Neural Link protocol v2.1.0</span>
             </div>
           </div>

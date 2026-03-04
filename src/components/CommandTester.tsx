@@ -45,7 +45,7 @@ export function CommandTester() {
       <div className="relative flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-mono font-bold text-text-primary uppercase tracking-[0.2em]">Protocol_Scanner</h3>
-          <p className="text-[10px] font-mono text-text-secondary uppercase mt-1 opacity-50">
+          <p className="text-xs font-mono text-text-secondary uppercase mt-1 opacity-70 tracking-wider">
             Verify neural command mapping
           </p>
         </div>
@@ -66,7 +66,7 @@ export function CommandTester() {
             rows={3}
             className="w-full bg-background/50 border border-border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all text-text-primary placeholder:text-text-secondary/20 resize-none shadow-inner custom-scrollbar"
           />
-          <div className="absolute bottom-3 right-3 text-[8px] font-mono text-text-secondary opacity-30 pointer-events-none">
+          <div className="absolute bottom-3 right-3 text-[10px] font-mono tracking-widest text-text-secondary opacity-50 pointer-events-none">
             CTRL + ENTER_TO_COMMIT
           </div>
         </div>
@@ -74,7 +74,7 @@ export function CommandTester() {
         <button
           onClick={handleTest}
           disabled={testing || !testInput.trim()}
-          className="w-full py-3 px-6 rounded-xl font-mono font-bold text-[10px] uppercase tracking-[0.2em] transition-all focus:outline-none focus:ring-2 focus:ring-primary/50
+          className="w-full py-3 px-6 rounded-xl font-mono font-bold text-xs uppercase tracking-widest transition-all focus:outline-none focus:ring-2 focus:ring-primary/50
             bg-primary text-white shadow-neon hover:bg-primary/90 
             disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
         >
@@ -93,31 +93,31 @@ export function CommandTester() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                  <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest">Match_Found</span>
+                  <span className="text-xs font-mono font-bold text-primary uppercase tracking-widest">Match_Found</span>
                 </div>
                 {result.success ? (
-                  <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest px-2 py-0.5 bg-accent/10 rounded border border-accent/20">Executed</span>
+                  <span className="text-xs font-mono font-bold text-accent uppercase tracking-widest px-2 py-0.5 bg-accent/10 rounded border border-accent/20">Executed</span>
                 ) : (
-                  <span className="text-[10px] font-mono font-bold text-error uppercase tracking-widest px-2 py-0.5 bg-error/10 rounded border border-error/20">Fault</span>
+                  <span className="text-xs font-mono font-bold text-error uppercase tracking-widest px-2 py-0.5 bg-error/10 rounded border border-error/20">Fault</span>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Trigger</span>
+                  <span className="text-xs font-mono text-text-secondary uppercase opacity-70 tracking-wider">Trigger</span>
                   <span className="text-xs font-mono font-bold text-text-primary tracking-tight">{result.trigger}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Action_Type</span>
+                  <span className="text-xs font-mono text-text-secondary uppercase opacity-70 tracking-wider">Action_Type</span>
                   <span className="text-xs font-mono font-bold text-text-primary tracking-tight uppercase">{result.action_type || 'Unknown'}</span>
                 </div>
               </div>
 
               {!!result.output && (
                 <div className="mt-2">
-                  <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50 mb-1 block">Output_Payload</span>
+                  <span className="text-xs font-mono tracking-wider text-text-secondary uppercase opacity-70 mb-1 block">Output_Payload</span>
                   <div className="bg-background/80 rounded-lg p-3 border border-border">
-                    <pre className="text-[10px] font-mono text-primary/80 overflow-x-auto custom-scrollbar">
+                    <pre className="text-xs font-mono text-primary/80 overflow-x-auto custom-scrollbar">
                       {JSON.stringify(result.output, null, 2)}
                     </pre>
                   </div>
@@ -125,7 +125,7 @@ export function CommandTester() {
               )}
 
               {result.error && (
-                <div className="mt-2 text-error font-mono text-[9px] uppercase tracking-tight flex items-center gap-2">
+                <div className="mt-2 text-error font-mono text-xs uppercase tracking-wider flex items-center gap-2">
                   <span className="w-1 h-1 rounded-full bg-error"></span>
                   ERROR: {result.error}
                 </div>
@@ -136,8 +136,8 @@ export function CommandTester() {
               <div className="w-8 h-8 rounded-full bg-error/10 flex items-center justify-center mb-1">
                 <span className="text-error text-lg">!</span>
               </div>
-              <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-[0.1em]">Null_Reference</span>
-              <span className="text-[9px] font-mono text-text-secondary uppercase opacity-50">
+              <span className="text-xs font-mono font-bold text-text-primary uppercase tracking-wider">Null_Reference</span>
+              <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70 tracking-wider">
                 Input stream does not match active protocols
               </span>
             </div>

@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "f9171faa-7266-4e00-ac31-7232bb985a6b",
+    "title": "WebSocket Stream Audio",
+    "messages": [],
+    "active_agent_ids": [
+      "34254639-3529-4cd9-a35c-ec71d51528a0"
+    ],
+    "created_at": "2026-03-04 21:12:33.136110",
+    "updated_at": "2026-03-04 21:12:33.136119"
+  }
+]

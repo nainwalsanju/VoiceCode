@@ -53,30 +53,30 @@ export function DictationDisplay({ text, onTextChange, isRecording = false }: Di
               <div className="w-2.5 h-2.5 rounded-full bg-warning/40 shadow-[0_0_8px_rgba(245,158,11,0.3)]"></div>
               <div className="w-2.5 h-2.5 rounded-full bg-success/40 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
             </div>
-            <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-primary uppercase opacity-80">Neural_Output_Buffer</h3>
+            <h3 className="text-xs font-mono font-bold tracking-widest text-text-primary uppercase opacity-80">Neural_Output_Buffer</h3>
           </div>
 
           <div className="hidden lg:flex items-center gap-4 border-l border-border/30 pl-6">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[7px] font-mono text-text-secondary uppercase opacity-40">Bitstream_Status</span>
-              <span className="text-[9px] font-mono text-accent font-bold uppercase tracking-tighter">Verified // 1024kbps</span>
+              <span className="text-[10px] tracking-wide font-mono text-text-secondary uppercase opacity-70">Bitstream_Status</span>
+              <span className="text-xs font-mono text-accent font-bold uppercase tracking-tight">Verified // 1024kbps</span>
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[7px] font-mono text-text-secondary uppercase opacity-40">Data_Integrity</span>
-              <span className="text-[9px] font-mono text-primary font-bold uppercase tracking-tighter">99.98% Crypt_Check</span>
+              <span className="text-[10px] tracking-wide font-mono text-text-secondary uppercase opacity-70">Data_Integrity</span>
+              <span className="text-xs font-mono text-primary font-bold uppercase tracking-tight">99.98% Crypt_Check</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {!isEditing && text && (
             <>
-              <button onClick={handleCopy} className="px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-text-secondary hover:text-primary transition-colors cursor-pointer border border-transparent hover:border-primary/20 rounded-md bg-surface/30">
+              <button onClick={handleCopy} className="px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wide text-text-secondary hover:text-primary transition-colors cursor-pointer border border-transparent hover:border-primary/20 rounded-md bg-surface/30">
                 Copy
               </button>
-              <button onClick={() => setIsEditing(true)} className="px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-text-secondary hover:text-secondary transition-colors cursor-pointer border border-transparent hover:border-secondary/20 rounded-md bg-surface/30">
+              <button onClick={() => setIsEditing(true)} className="px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wide text-text-secondary hover:text-secondary transition-colors cursor-pointer border border-transparent hover:border-secondary/20 rounded-md bg-surface/30">
                 Edit
               </button>
-              <button onClick={handleClear} className="px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-error/60 hover:text-error transition-colors cursor-pointer border border-transparent hover:border-error/20 rounded-md bg-surface/30">
+              <button onClick={handleClear} className="px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wide text-error/60 hover:text-error transition-colors cursor-pointer border border-transparent hover:border-error/20 rounded-md bg-surface/30">
                 Purge
               </button>
             </>
@@ -103,8 +103,8 @@ export function DictationDisplay({ text, onTextChange, isRecording = false }: Di
               rows={6}
             />
             <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
-              <button onClick={handleCancel} className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors cursor-pointer">Abort</button>
-              <button onClick={handleSave} className="px-6 py-2 text-[10px] font-bold uppercase tracking-widest bg-primary text-white rounded-lg shadow-neon hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all cursor-pointer">Commit</button>
+              <button onClick={handleCancel} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors cursor-pointer">Abort</button>
+              <button onClick={handleSave} className="px-6 py-2 text-xs font-bold uppercase tracking-widest bg-primary text-white rounded-lg shadow-neon hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all cursor-pointer">Commit</button>
             </div>
           </div>
         ) : (
@@ -124,7 +124,7 @@ export function DictationDisplay({ text, onTextChange, isRecording = false }: Di
               </p>
             )}
             {isRecording && (
-              <div className="absolute bottom-[-10px] right-2 flex items-center gap-2 px-3 py-1 bg-secondary text-white text-[9px] font-bold uppercase tracking-widest rounded-full shadow-lg shadow-secondary/30 animate-pulse">
+              <div className="absolute bottom-[-10px] right-2 flex items-center gap-2 px-3 py-1 bg-secondary text-white text-xs font-bold uppercase tracking-widest rounded-full shadow-lg shadow-secondary/30 animate-pulse">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
                 Uplink Active
               </div>

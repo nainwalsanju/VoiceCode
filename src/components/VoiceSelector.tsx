@@ -80,7 +80,7 @@ export function VoiceSelector({ onVoiceChange, selectedVoiceId }: VoiceSelectorP
           {selectedVoiceData ? (
             <>
               {selectedVoiceData.type === 'cloned' && (
-                <span className="text-[8px] bg-accent/20 text-accent px-2 py-0.5 rounded uppercase mr-2">
+                <span className="text-[10px] font-bold bg-accent/20 text-accent px-2 py-0.5 rounded uppercase mr-2 tracking-wide">
                   CLONE
                 </span>
               )}
@@ -109,17 +109,16 @@ export function VoiceSelector({ onVoiceChange, selectedVoiceId }: VoiceSelectorP
           {/* Cloned voices section */}
           {voices.filter(v => v.type === 'cloned').length > 0 && (
             <>
-              <div className="px-4 py-2 text-[10px] font-mono text-text-secondary uppercase tracking-wider bg-surface/30">
+              <div className="px-4 py-2 text-xs font-mono font-bold text-text-secondary uppercase tracking-wider bg-surface/30">
                 Cloned Voices
               </div>
               {voices.filter(v => v.type === 'cloned').map(voice => (
                 <div
                   key={voice.id}
-                  className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all ${
-                    selectedVoice === voice.id
+                  className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all ${selectedVoice === voice.id
                       ? 'bg-primary/20 text-primary'
                       : 'hover:bg-surface/70 text-text-primary'
-                  }`}
+                    }`}
                   onClick={() => {
                     setSelectedVoice(voice.id);
                     onVoiceChange?.(voice.id);
@@ -127,7 +126,7 @@ export function VoiceSelector({ onVoiceChange, selectedVoiceId }: VoiceSelectorP
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-[8px] font-mono bg-accent/20 text-accent px-2 py-0.5 rounded uppercase">
+                    <span className="text-[10px] font-bold font-mono tracking-wide bg-accent/20 text-accent px-2 py-0.5 rounded uppercase">
                       CLONE
                     </span>
                     <span className="text-xs font-mono font-bold uppercase">
@@ -157,9 +156,8 @@ export function VoiceSelector({ onVoiceChange, selectedVoiceId }: VoiceSelectorP
 
       {/* Link status indicator */}
       <div
-        className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-background shadow-sm transition-colors duration-500 ${
-          selectedVoice ? 'bg-accent animate-pulse' : 'bg-text-secondary/30'
-        }`}
+        className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-background shadow-sm transition-colors duration-500 ${selectedVoice ? 'bg-accent animate-pulse' : 'bg-text-secondary/30'
+          }`}
       />
     </div>
   );

@@ -99,7 +99,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       {error && (
-        <div className="bg-error/10 border border-error/20 text-error p-4 rounded-xl text-[10px] font-mono font-bold uppercase tracking-tight flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
+        <div className="bg-error/10 border border-error/20 text-error p-4 rounded-xl text-xs font-mono font-bold uppercase tracking-tight flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
           <span className="w-1.5 h-1.5 rounded-full bg-error animate-ping shrink-0"></span>
           {error}
         </div>
@@ -107,7 +107,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="flex flex-col gap-2.5">
-          <label htmlFor="trigger" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em] pl-1 opacity-60">
+          <label htmlFor="trigger" className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider pl-1 opacity-80">
             Trigger_Pattern_Identity
           </label>
           <div className="relative group/input">
@@ -120,12 +120,12 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
               required
               className="w-full bg-background/80 border border-border/80 rounded-xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-text-primary placeholder:text-text-secondary/40 font-mono shadow-sm group-hover/input:border-primary/40"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono text-primary opacity-0 group-focus-within/input:opacity-100 transition-opacity">_LISTEN</div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-mono text-primary opacity-0 group-focus-within/input:opacity-100 transition-opacity">_LISTEN</div>
           </div>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <label htmlFor="actionType" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em] pl-1 opacity-60">
+          <label htmlFor="actionType" className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider pl-1 opacity-80">
             Execution_Protocol_Type
           </label>
           <div className="relative group/input">
@@ -152,7 +152,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="description" className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+        <label htmlFor="description" className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider pl-1 opacity-80">
           Protocol_Description
         </label>
         <input
@@ -167,10 +167,10 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
 
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between px-1">
-          <label htmlFor="actionData" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em] opacity-60">
+          <label htmlFor="actionData" className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider opacity-80">
             Internal_Payload_Logic
           </label>
-          <span className="text-[8px] font-mono text-primary/40 font-bold uppercase tracking-tighter">Enc: UTF-8 // Type: JSON</span>
+          <span className="text-[10px] font-mono text-primary/60 font-bold uppercase tracking-tight">Enc: UTF-8 // Type: JSON</span>
         </div>
         <div className="relative">
           <textarea
@@ -194,9 +194,9 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
             onChange={(e) => setIsRegex(e.target.checked)}
             className="w-4 h-4 rounded border-border bg-surface text-secondary focus:ring-secondary/50 focus:ring-offset-background"
           />
-          <div className="flex flex-col">
-            <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-secondary transition-colors">Regex</span>
-            <span className="text-[8px] font-mono text-text-secondary uppercase">Pattern_Match</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-secondary transition-colors">Regex</span>
+            <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70">Pattern_Match</span>
           </div>
         </label>
 
@@ -207,14 +207,14 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
             onChange={(e) => setIsActive(e.target.checked)}
             className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent/50 focus:ring-offset-background"
           />
-          <div className="flex flex-col">
-            <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-accent transition-colors">Active</span>
-            <span className="text-[8px] font-mono text-text-secondary uppercase">Status_Link</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-accent transition-colors">Active</span>
+            <span className="text-[10px] font-mono text-text-secondary uppercase opacity-70">Status_Link</span>
           </div>
         </label>
 
-        <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-surface/60 border border-border shadow-sm">
-          <label htmlFor="priority" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+        <div className="flex flex-col gap-1.5 p-3.5 rounded-xl bg-surface/60 border border-border shadow-sm">
+          <label htmlFor="priority" className="text-xs font-mono font-bold text-text-secondary uppercase tracking-wider pl-1 opacity-80">
             Priority_Level
           </label>
           <input
@@ -233,7 +233,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
         {onCancel && (
           <button
             type="button"
-            className="flex-1 py-4 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-[0.2em] bg-surface/80 text-text-secondary border border-border hover:bg-surface hover:text-text-primary transition-all cursor-pointer shadow-sm"
+            className="flex-1 py-4 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-widest bg-surface/80 text-text-secondary border border-border hover:bg-surface hover:text-text-primary transition-all cursor-pointer shadow-sm"
             onClick={onCancel}
           >
             Abort
@@ -242,7 +242,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 py-4 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-[0.2em] bg-primary text-white shadow-neon hover:bg-primary/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="flex-1 py-4 px-4 rounded-xl font-bold font-mono text-xs uppercase tracking-widest bg-primary text-white shadow-neon hover:bg-primary/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
         >
           {saving ? 'Transmitting...' : command ? 'Update_Logic' : 'Commit_Protocol'}
         </button>

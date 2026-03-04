@@ -53,7 +53,7 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-3">
         <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full shadow-neon"></div>
-        <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-secondary uppercase animate-pulse">Scanning Neural Banks...</span>
+        <span className="text-xs font-mono font-bold tracking-widest text-text-secondary uppercase animate-pulse">Scanning Neural Banks...</span>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
         </div>
         <button
           onClick={loadProfiles}
-          className="w-full py-2.5 bg-error/20 text-error hover:bg-error/30 border border-error/30 rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+          className="w-full py-2.5 bg-error/20 text-error hover:bg-error/30 border border-error/30 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
         >
           Re-establish Link
         </button>
@@ -81,8 +81,8 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
         <svg className="w-12 h-12 mx-auto mb-4 opacity-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
         </svg>
-        <p className="text-sm font-mono opacity-40 uppercase tracking-widest">No Active Neural Profiles</p>
-        <p className="text-[10px] mt-2 opacity-30 font-mono">Initialization required</p>
+        <p className="text-sm font-mono opacity-80 text-text-secondary uppercase tracking-wider">No Active Neural Profiles</p>
+        <p className="text-xs mt-2 opacity-60 font-mono">Initialization required</p>
       </div>
     );
   }
@@ -108,7 +108,7 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
             <div className="flex flex-col">
               <span className="font-bold text-text-primary tracking-tight group-hover:text-primary transition-colors">{profile.name}</span>
               {profile.is_default && (
-                <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-[0.2em] mt-0.5">Primary_Link</span>
+                <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest mt-0.5">Primary_Link</span>
               )}
             </div>
           </div>
@@ -116,7 +116,7 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
           <div className="flex items-center gap-2 mt-4 sm:mt-0 opacity-0 group-hover:opacity-100 transition-opacity">
             {!profile.is_default && (
               <button
-                className="px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 transition-all cursor-pointer border border-primary/20"
+                className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-primary/10 text-primary hover:bg-primary/20 transition-all cursor-pointer border border-primary/20"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSetDefault(profile.id);
@@ -126,7 +126,7 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
               </button>
             )}
             <button
-              className="px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest bg-error/10 text-error/70 hover:text-error hover:bg-error/20 transition-all cursor-pointer border border-error/20"
+              className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-error/10 text-error/70 hover:text-error hover:bg-error/20 transition-all cursor-pointer border border-error/20"
               onClick={(e) => {
                 e.stopPropagation();
                 handleDelete(profile.id);

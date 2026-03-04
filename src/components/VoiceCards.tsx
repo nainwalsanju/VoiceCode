@@ -73,7 +73,7 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
       }
 
       const data = await response.json();
-      
+
       // Create audio element and play
       const audio = new Audio(`data:audio/wav;base64,${data.audio}`);
       audio.onended = () => {
@@ -84,7 +84,7 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
         setPreviewingVoice(null);
         setAudioElement(null);
       };
-      
+
       await audio.play();
       setAudioElement(audio);
     } catch (err) {
@@ -112,7 +112,7 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
             <div className="w-2.5 h-2.5 rounded-full bg-accent/40 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
             <div className="w-2.5 h-2.5 rounded-full bg-secondary/40 shadow-[0_0_8px_rgba(168,85,247,0.3)]"></div>
           </div>
-          <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-primary uppercase opacity-80">
+          <h3 className="text-xs font-mono font-bold tracking-widest text-text-primary uppercase opacity-80">
             Voice_Selection_Matrix
           </h3>
         </div>
@@ -131,15 +131,15 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
               onClick={() => handleSelect(voice)}
               className={`
                 relative p-4 rounded-xl border cursor-pointer transition-all duration-300
-                ${isSelected 
-                  ? 'bg-primary/10 border-primary/50 shadow-[0_0_20px_rgba(99,102,241,0.2)]' 
+                ${isSelected
+                  ? 'bg-primary/10 border-primary/50 shadow-[0_0_20px_rgba(99,102,241,0.2)]'
                   : 'bg-surface/60 border-border/80 hover:border-primary/30 hover:bg-surface/80'
                 }
               `}
             >
               {/* Default indicator */}
               {isDefault && (
-                <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-accent text-white text-[8px] font-bold uppercase tracking-wider rounded-full shadow-lg">
+                <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-accent text-white text-[10px] font-bold uppercase tracking-wide rounded-full shadow-lg">
                   Default
                 </div>
               )}
@@ -150,7 +150,7 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
               </h4>
 
               {/* Engine badge */}
-              <div className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border ${engineColor} mb-3`}>
+              <div className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${engineColor} mb-3`}>
                 {ENGINE_NAMES[voice.engine] || voice.engine}
               </div>
 
@@ -160,9 +160,9 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
                   onClick={(e) => handleSetDefault(voice, e)}
                   disabled={isDefault}
                   className={`
-                    flex-1 px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider rounded-lg transition-all
-                    ${isDefault 
-                      ? 'bg-accent/20 text-accent cursor-default' 
+                    flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all
+                    ${isDefault
+                      ? 'bg-accent/20 text-accent cursor-default'
                       : 'bg-surface/50 text-text-secondary hover:bg-accent/20 hover:text-accent border border-border hover:border-accent/30'
                     }
                   `}
@@ -176,7 +176,7 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
                   }}
                   disabled={isPreviewing}
                   className={`
-                    px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider rounded-lg transition-all
+                    px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all
                     ${isPreviewing
                       ? 'bg-secondary/20 text-secondary animate-pulse'
                       : 'bg-surface/50 text-text-secondary hover:bg-secondary/20 hover:text-secondary border border-border hover:border-secondary/30'
@@ -199,9 +199,9 @@ export function VoiceCards({ onVoiceSelect }: VoiceCardsProps) {
       {/* Selected voice info */}
       {selectedVoice && (
         <div className="mt-4 p-3 bg-surface/40 border border-border/50 rounded-lg">
-          <span className="text-[9px] font-mono text-text-secondary uppercase tracking-wider">
+          <span className="text-[10px] font-mono text-text-secondary uppercase tracking-wider">
             Selected: </span>
-          <span className="text-[10px] font-mono font-bold text-primary">
+          <span className="text-xs font-mono font-bold text-primary">
             {voices.find(v => v.id === selectedVoice)?.name || selectedVoice}
           </span>
         </div>

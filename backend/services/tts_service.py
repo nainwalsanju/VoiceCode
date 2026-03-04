@@ -4,6 +4,8 @@ import time
 from typing import Optional, AsyncGenerator
 from dataclasses import dataclass
 import numpy as np
+import scipy.io.wavfile as wavfile
+import asyncio
 
 logger = structlog.get_logger()
 
@@ -156,13 +158,13 @@ class TTSService:
         
         try:
             if self._qwen3_model:
-                audio = self._qwen3_model.generate(text)
+                audio = await asyncio.to_thread(self._qwen3_model.generate, text)
                 audio_bytes = self._audio_to_bytes(audio)
             elif self._pocket_model:
-                audio = self._pocket_model.generate(text)
+                audio = await asyncio.to_thread(self._pocket_model.generate, text)
                 audio_bytes = self._audio_to_bytes(audio)
             elif self._kokoro_model:
-                audio = self._kokoro_model.generate(text)
+                audio = await asyncio.to_thread(self._kokoro_model.generate, text)
                 audio_bytes = self._audio_to_bytes(audio)
             elif self._edge_model:
                 import edge_tts
@@ -172,7 +174,22 @@ class TTSService:
                     if chunk["type"] == "audio":
                         audio_bytes += chunk["data"]
             else:
-                audio_bytes = self._generate_silence(len(text))
+                # Check if it's a cloned voice profile
+                from backend.models.voice_profile import get_voice_profile_store
+                from backend.services.voice_clone_service import get_voice_cloning_service
+                
+                profile = get_voice_profile_store().get(voice)
+                if profile and profile.audio_sample_path:
+                    clone_service = get_voice_cloning_service()
+                    try:
+                        audio_bytes, _ = await asyncio.to_thread(
+                            clone_service.generate_audio, text, profile.audio_sample_path
+                        )
+                    except Exception as clone_err:
+                        logger.warning("cloned_voice_generation_failed", voice=voice, error=str(clone_err))
+                        audio_bytes = self._generate_silence(len(text))
+                else:
+                    audio_bytes = self._generate_silence(len(text))
         except Exception as e:
             logger.error("tts_generation_error", error=str(e))
             audio_bytes = self._generate_silence(len(text))
@@ -267,6 +284,34 @@ class TTSService:
                         logger.info("tts_first_chunk_latency", ms=chunk_latency)
                     yield self._audio_to_bytes(audio_chunk)
             else:
+                # Check if it's a cloned voice profile
+                from backend.models.voice_profile import get_voice_profile_store
+                from backend.services.voice_clone_service import get_voice_cloning_service
+
+                profile = get_voice_profile_store().get(voice)
+                if profile and profile.audio_sample_path:
+                    clone_service = get_voice_cloning_service()
+                    try:
+                        # Attempt to generate audio using the clone service synchronously in thread
+                        audio_bytes, _ = await asyncio.to_thread(
+                            clone_service.generate_audio, text, profile.audio_sample_path
+                        )
+                        
+                        if audio_bytes:
+                            chunk_latency = (time.perf_counter() - start_time) * 1000
+                            if not first_chunk_sent:
+                                self._first_chunk_latency = chunk_latency
+                                first_chunk_sent = True
+                                logger.info("tts_first_chunk_latency", ms=chunk_latency)
+                                
+                            # Yield proper chunks
+                            chunk_size = 4096
+                            for i in range(0, len(audio_bytes), chunk_size):
+                                yield audio_bytes[i:i+chunk_size]
+                            return
+                    except Exception as clone_err:
+                        logger.warning("cloned_voice_generation_failed", voice=voice, error=str(clone_err))
+
                 # Fallback: generate placeholder chunks
                 for i in range(max(1, len(text) // 10)):
                     chunk_latency = (time.perf_counter() - start_time) * 1000
@@ -295,7 +340,6 @@ class TTSService:
         if isinstance(audio, bytes):
             return audio
         if isinstance(audio, np.ndarray):
-            import scipy.io.wavfile as wavfile
             buffer = io.BytesIO()
             sample_rate = getattr(audio, 'sr', 24000)
             wavfile.write(buffer, sample_rate, audio)
@@ -307,7 +351,6 @@ class TTSService:
         sample_rate = 24000
         samples = int(duration_sec * sample_rate)
         silence = np.zeros(samples, dtype=np.int16)
-        import scipy.io.wavfile as wavfile
         buffer = io.BytesIO()
         wavfile.write(buffer, sample_rate, silence)
         return buffer.getvalue()
@@ -316,7 +359,6 @@ class TTSService:
         sample_rate = 24000
         chunk_samples = int(size * sample_rate / 1000)
         audio = np.zeros(chunk_samples, dtype=np.int16)
-        import scipy.io.wavfile as wavfile
         buffer = io.BytesIO()
         wavfile.write(buffer, sample_rate, audio)
         return buffer.getvalue()
