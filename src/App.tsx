@@ -10,10 +10,11 @@ import { CommandList } from "./components/CommandList";
 import { CommandForm } from "./components/CommandForm";
 import { CommandTester } from "./components/CommandTester";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { AgentBuilder } from "./components/AgentBuilder";
+import { ChatFeed } from "./components/ChatFeed";
 import { useDictationStore } from "./store/dictationStore";
 import { useTheme } from "./hooks/useTheme";
-
-type View = "dictate" | "voices" | "commands" | "test";
+type View = "dictate" | "voices" | "commands" | "test" | "chat";
 
 function App() {
   const [currentView, setCurrentView] = useState<View>("dictate");
@@ -68,6 +69,7 @@ function App() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
           {[
+            { id: "chat" as View, label: "COMM_ARRAY", icon: "00", desc: "Multi-Agent Chat Protocols" },
             { id: "dictate" as View, label: "NEURAL_TRANSCRIPT", icon: "01", desc: "Real-time speech capture" },
             { id: "voices" as View, label: "VOCAL_PROFILES", icon: "02", desc: "Neural voice mapping" },
             { id: "commands" as View, label: "COMM_PROTOCOLS", icon: "03", desc: "Automated trigger sets" },
@@ -139,12 +141,14 @@ function App() {
                 {currentView === "voices" && "Vocal_Identity_Terminal"}
                 {currentView === "commands" && "Command_Protocol_Registry"}
                 {currentView === "test" && "Neural_Diagnostic_Array"}
+                {currentView === "chat" && "Multi_Agent_Comm_Matrix"}
               </h2>
               <p className="text-[10px] font-mono text-text-secondary uppercase opacity-40 mt-1.5 tracking-[0.2em]">
                 {currentView === "dictate" && "Mode: Real-time_Neural_Capture // Status: Active"}
                 {currentView === "voices" && "Mode: Identity_Relink // Status: Secure"}
                 {currentView === "commands" && "Mode: Protocol_Registry_V2 // Status: Ready"}
                 {currentView === "test" && "Mode: Diagnostic_Validation // Status: Deep_Scan"}
+                {currentView === "chat" && "Mode: AI_Cross_Talk // Status: Listening"}
               </p>
             </div>
 
@@ -183,7 +187,27 @@ function App() {
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto space-y-8">
+            {currentView === "chat" && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
+                <div className="lg:col-span-2">
+                  <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-primary/30">
+                    <ChatFeed />
+                  </div>
+                </div>
+                <div className="col-span-1">
+                  <div className="bg-surface/90 backdrop-blur-lg rounded-xl border border-border/80 p-8 shadow-2xl relative overflow-hidden group transition-all duration-500 hover:border-secondary/30 h-[600px] overflow-y-auto">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 font-mono text-[10px] tracking-tighter uppercase pointer-events-none">Orchestrator_Link</div>
+                    <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest mb-6 text-text-secondary opacity-70">Agent_Forge</h3>
+                    <AgentBuilder />
+                  </div>
+                </div>
+                <div className="flex justify-center py-6 lg:col-span-3">
+                  <VoiceButton onTranscript={handleTranscript} />
+                </div>
+              </div>
+            )}
+
             {currentView === "dictate" && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
                 <div className="flex justify-center py-12">

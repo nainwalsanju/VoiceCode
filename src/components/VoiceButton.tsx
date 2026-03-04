@@ -167,7 +167,7 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
             // LLM finished - ready for TTS
           } else if (data.type === 'sentence_start' && data.text) {
             // Add assistant message to transcript
-            addMessage('assistant', data.text);
+            addMessage('assistant', data.text, data.agent);
           }
         } catch (e) {
           console.error('WS Parse error:', e);

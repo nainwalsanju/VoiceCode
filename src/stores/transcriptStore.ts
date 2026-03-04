@@ -1,5 +1,11 @@
 import { create } from 'zustand';
 
+export interface AgentMeta {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export type MessageRole = 'user' | 'assistant';
 
 export interface Message {
@@ -7,12 +13,13 @@ export interface Message {
   role: MessageRole;
   content: string;
   timestamp: number;
+  agent?: AgentMeta;
 }
 
 interface TranscriptState {
   messages: Message[];
   maxMessages: number;
-  addMessage: (role: MessageRole, content: string) => void;
+  addMessage: (role: MessageRole, content: string, agent?: AgentMeta) => void;
   clearTranscript: () => void;
 }
 
@@ -22,12 +29,13 @@ export const useTranscriptStore = create<TranscriptState>((set) => ({
   messages: [],
   maxMessages: MAX_MESSAGES,
 
-  addMessage: (role: MessageRole, content: string) => {
+  addMessage: (role: MessageRole, content: string, agent?: AgentMeta) => {
     set((state) => {
       const newMessage: Message = {
         id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         role,
         content,
+        agent,
         timestamp: Date.now(),
       };
 
