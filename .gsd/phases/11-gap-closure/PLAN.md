@@ -18,7 +18,7 @@ During the v2.0 audit, two main concerns were identified:
 
 ## Tasks
 
-<task type="auto">
+<task type="auto" status="done">
   <name>Migrate edge-tts to Python Async</name>
   <files>backend/services/tts_service.py</files>
   <action>Ensure `stream_audio_async` and `generate_audio_async` strictly use `edge_tts.Communicate(text, voice)` async generators instead of any subprocess abstractions.</action>
@@ -26,7 +26,7 @@ During the v2.0 audit, two main concerns were identified:
   <done>No child process tracking required.</done>
 </task>
 
-<task type="auto">
+<task type="auto" status="done">
   <name>Implement TTS Failure Fallback UI</name>
   <files>backend/routes/agent_stream.py, src/components/DictationDisplay.tsx</files>
   <action>Build a fallback state that pushes an `error` payload over the WebSocket if generation fails, and ensure the UI renders a visible red alert or drops correctly to the `idle` state instead of hanging in `processing`.</action>

@@ -168,6 +168,12 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
           } else if (data.type === 'sentence_start' && data.text) {
             // Add assistant message to transcript
             addMessage('assistant', data.text, data.agent);
+          } else if (data.type === 'error') {
+            console.error('TTS Steam Error:', data.message);
+            setError(data.message || 'Transmission Failed');
+            setWsSessionState('IDLE');
+            // Cleanly abort continuous loop if there's a fatal breakdown
+            if (isRecording) stopInteraction();
           }
         } catch (e) {
           console.error('WS Parse error:', e);

@@ -80,6 +80,11 @@ async def flush_sentence_to_tts(sentence: str, agent, tts_service: TTSService, w
             })
     except Exception as e:
         logger.error("tts_stream_failure", error=str(e))
+        # Push explicit error state to the client over socket
+        await manager.send_message({
+            "type": "error",
+            "message": f"Voice synthesis failed: {str(e)}"
+        }, websocket)
     
     # Notify client that sentence is complete
     await manager.send_message({
