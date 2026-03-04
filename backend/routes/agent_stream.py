@@ -8,8 +8,9 @@ import traceback
 import re
 
 from backend.services.stt_stream_service import transcribe_stream
-from backend.services.tts_service import get_tts_service
-from backend.services.llm_service import get_llm_service
+from backend.services.tts_service import get_tts_service, TTSService
+from backend.services.orchestrator_service import get_orchestrator_service
+from backend.services.agent_service import get_agent_service
 
 logger = structlog.get_logger()
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -43,37 +44,42 @@ Keep your responses concise and natural, as they will be spoken aloud.
 Respond to user queries in a conversational manner."""
 
 
-async def flush_sentence_to_tts(sentence: str, tts_service, websocket, manager):
+async def flush_sentence_to_tts(sentence: str, agent, tts_service: TTSService, websocket: WebSocket, manager: AgentConnectionManager):
     """
-    Stream a complete sentence to TTS and send to client.
-    
-    Args:
-        sentence: The sentence text to speak
-        tts_service: TTS service instance
-        websocket: WebSocket connection
-        manager: Connection manager
+    Stream a complete sentence to TTS and send to client, using the agent's Voice Profile.
     """
     if not sentence or not sentence.strip():
         return
     
     sentence = sentence.strip()
     
+    # Notify client that a sentence is starting, and who is speaking
+    await manager.send_message({
+        "type": "sentence_start",
+        "text": sentence,
+        "agent": {
+            "id": agent.id,
+            "name": agent.name,
+            "color": agent.color
+        }
+    }, websocket)
+    
     # Send speaking state when TTS starts
     await manager.send_message({"type": "state", "state": "speaking"}, websocket)
     
-    # Notify client that a sentence is starting
-    await manager.send_message({
-        "type": "sentence_start",
-        "text": sentence
-    }, websocket)
+    # Map agent's linked voice profile if it exists, otherwise use TTS defaults.
+    voice_profile_id = agent.voice_profile_id
     
-    # Stream TTS audio for this sentence
-    async for audio_bytes_chunk in tts_service.stream_audio_async(sentence):
-        encoded_audio = base64.b64encode(audio_bytes_chunk).decode('utf-8')
-        await websocket.send_json({
-            "type": "tts_audio",
-            "data": encoded_audio
-        })
+    try:
+        # Stream TTS audio for this sentence
+        async for audio_bytes_chunk in tts_service.stream_audio_async(sentence, voice=voice_profile_id or tts_service.get_default_voice()):
+            encoded_audio = base64.b64encode(audio_bytes_chunk).decode('utf-8')
+            await websocket.send_json({
+                "type": "tts_audio",
+                "data": encoded_audio
+            })
+    except Exception as e:
+        logger.error("tts_stream_failure", error=str(e))
     
     # Notify client that sentence is complete
     await manager.send_message({
@@ -106,9 +112,16 @@ def extract_sentences(text: str) -> tuple[str, str]:
 async def websocket_agent_stream(websocket: WebSocket):
     await manager.connect(websocket)
     tts_service = get_tts_service()
+    orchestrator = get_orchestrator_service()
+    agent_service = get_agent_service()
     
-    # Simple simulated conversational context
-    context_buffer = []
+    # Grab the default session or create one
+    sessions = agent_service.get_sessions()
+    if not sessions:
+        session = agent_service.create_session("WebSocket Stream Audio")
+    else:
+        session = sessions[0]
+
     cumulative_audio = bytearray()
 
     try:
@@ -179,58 +192,49 @@ async def websocket_agent_stream(websocket: WebSocket):
                         "is_final": True
                     }, websocket)
                 
-                    # 3. Process LLM Logic with streaming
-                    context_buffer.append({"role": "user", "content": text})
+                    # 3. Process LLM Logic with multi-agent orchestrator streaming
                     logger.info("agent_received_text", text=text)
                     
                     # Send processing state (LLM thinking)
                     await manager.send_message({"type": "state", "state": "processing"}, websocket)
                     
-                    # Get LLM service
-                    llm_service = get_llm_service()
-                    
-                    # Sentence buffer for streaming
                     sentence_buffer = ""
+                    last_speaking_agent = None
                     
                     try:
-                        # Stream response from LLM sentence by sentence
-                        async for chunk in llm_service.stream_completion(
-                            messages=context_buffer,
-                            system_prompt=DEFAULT_SYSTEM_PROMPT
-                        ):
+                        # Stream response from Orchestrator sentence by sentence
+                        async for agent, chunk in orchestrator.stream_agent_response(session, text):
+                            last_speaking_agent = agent
                             sentence_buffer += chunk
                             
                             # Check for complete sentences
                             complete_sentence, sentence_buffer = extract_sentences(sentence_buffer)
                             
                             if complete_sentence:
-                                # Add to context
-                                context_buffer.append({"role": "assistant", "content": complete_sentence})
-                                
-                                # Stream this complete sentence to TTS immediately
+                                # Stream this complete sentence to TTS immediately using agent bounds
                                 await flush_sentence_to_tts(
                                     complete_sentence, 
+                                    agent,
                                     tts_service, 
                                     websocket, 
                                     manager
                                 )
                         
                         # Handle any remaining content in buffer
-                        if sentence_buffer and sentence_buffer.strip():
-                            context_buffer.append({"role": "assistant", "content": sentence_buffer})
+                        if sentence_buffer and sentence_buffer.strip() and last_speaking_agent:
                             await flush_sentence_to_tts(
                                 sentence_buffer,
+                                last_speaking_agent,
                                 tts_service,
                                 websocket,
                                 manager
                             )
                             
                     except Exception as e:
-                        logger.error("llm_stream_error", error=str(e), traceback=traceback.format_exc())
+                        logger.error("orchestrator_stream_error", error=str(e), traceback=traceback.format_exc())
                         # Send fallback message
                         fallback = "I'm sorry, I'm having trouble processing that right now."
-                        context_buffer.append({"role": "assistant", "content": fallback})
-                        await flush_sentence_to_tts(fallback, tts_service, websocket, manager)
+                        await flush_sentence_to_tts(fallback, agent_service.get_agents()[0], tts_service, websocket, manager)
                     
                     # Notify LLM processing is complete
                     await manager.send_message({"type": "llm_end"}, websocket)
@@ -239,8 +243,8 @@ async def websocket_agent_stream(websocket: WebSocket):
                     await manager.send_message({"type": "state", "state": "idle"}, websocket)
 
             elif message.get("type") == "reset":
-                context_buffer = []
                 cumulative_audio = bytearray()
+                session = agent_service.create_session("Reset Session") # Reset means new session mathematically
                 await manager.send_message({"type": "reset", "message": "Context cleared"}, websocket)
 
     except WebSocketDisconnect:
