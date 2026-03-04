@@ -1,0 +1,32 @@
+[
+  {
+    "id": "34254639-3529-4cd9-a35c-ec71d51528a0",
+    "name": "Jarvis",
+    "description": "Default VoiceCode Assistant",
+    "system_prompt": "You are Jarvis, a helpful, brilliant, and deeply knowledgeable voice AI assistant for VoiceCode. You write code, explain concepts, and help the user.",
+    "voice_profile_id": null,
+    "color": "#3B82F6",
+    "created_at": "2026-03-04 20:32:01.134629",
+    "updated_at": "2026-03-04 20:32:01.134637"
+  },
+  {
+    "id": "18b7e36b-2646-4190-9e10-63c3da4cfc22",
+    "name": "Test Agent",
+    "description": "",
+    "system_prompt": "A helpful test assistant that provides clear answers.",
+    "voice_profile_id": null,
+    "color": "#3B82F6",
+    "created_at": "2026-03-04 20:35:04.415284",
+    "updated_at": "2026-03-04 20:35:04.415293"
+  },
+  {
+    "id": "96b4e1f9-8e20-45ef-870d-d562a58e599c",
+    "name": "Test Persona",
+    "description": "",
+    "system_prompt": "This is a test persona for verification.",
+    "voice_profile_id": null,
+    "color": "#3B82F6",
+    "created_at": "2026-03-04 20:37:43.728966",
+    "updated_at": "2026-03-04 20:37:43.728973"
+  }
+]
