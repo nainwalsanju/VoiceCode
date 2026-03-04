@@ -1,6 +1,6 @@
 # VoiceCode — Roadmap
 
-> **Status**: `v1.0 MVP Complete`
+> **Status**: `v2.0 In Progress`
 
 ## Phase 1: Foundation (Wave 1) ✓
 - [x] 01-01: Project Setup & Tauri Config
@@ -33,4 +33,18 @@
 
 ---
 
-*Last updated: 2026-03-02*
+## Phase 6: Multi-Agent Core (Wave 4) ✓
+- [x] 06-01: Agent Profile Data Models
+- [x] 06-02: Agent Management API Routes
+- [x] 06-03: Chat Data Models & SQLite/JSON Storage
+
+## Phase 7: Orchestrator & Voice Linking (Wave 4) ✓
+- [x] 07-01: Conversational Orchestrator (Multi-Agent LLM Routing)
+- [x] 07-02: Voice Profile to Agent Linking
+- [x] 07-03: TTS Injector Hook
+
+## Phase 8: Conversational UI (Wave 5) ✓
+- [x] 08-01: Chat Feed Component
+- [x] 08-02: Agent Builder Sidebar
+- [x] 08-03: Multi-Speaker Waveform Animations
+- [x] 08-04: E2E Integration Testing
