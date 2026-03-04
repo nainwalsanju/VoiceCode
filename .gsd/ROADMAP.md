@@ -48,3 +48,29 @@
 - [x] 08-02: Agent Builder Sidebar
 - [x] 08-03: Multi-Speaker Waveform Animations
 - [x] 08-04: E2E Integration Testing
+
+---
+
+## Phase 9: UI Readability & Typography Polish (Wave 5)
+- [ ] 09-01: Update Global Font Stack (Swap IBM Plex Sans for Inter/Outfit)
+- [ ] 09-02: Eliminate Micro-Typography (Replace 8px/10px text with standard base sizes)
+- [ ] 09-03: Reduce Extreme Tracking & Uppercase Density
+- [ ] 09-04: Improve Contrast Ratios (Increase text opacities from 30-40% to 60-80%)
+
+---
+
+## Phase 10: Production-Ready Voice Cloning Integration (Wave 5) ✓
+- [x] 10-01: Procurement/Generation of immaculate audio cloning sources
+- [x] 10-02: Integrate cloned instances safely into TTS memory bounds
+- [x] 10-03: Implement synchronous `/preview` UI API functionality
+- [x] 10-04: E2E Browser Subagent Verification Matrix
+
+---
+
+## Phase 11: Gap Closure (Wave 6)
+**Status**: ⬜ Not Started
+**Objective**: Address technical debt gaps from v2.0 milestone audit
+
+**Gaps to Close:**
+- [ ] 11-01: Migrate `edge-tts` subprocess to native python bindings (`edge_tts.Communicate`)
+- [ ] 11-02: Implement robust TTS failure fallback UI states for silent timeouts
