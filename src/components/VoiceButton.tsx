@@ -16,7 +16,7 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
   const [wsSessionState, setWsSessionState] = useState<SessionState>('IDLE');
   const [isConnecting, setIsConnecting] = useState(false);
   const [hotkeyActivated, setHotkeyActivated] = useState(false);
-  
+
   // Use session store for state management
   const {
     currentState,
@@ -28,21 +28,21 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
     interruptSpeaking,
     isContinuousMode
   } = useSessionStore();
-  
+
   // Add messages to transcript store
   const addMessage = useTranscriptStore((state) => state.addMessage);
-  
+
   // Derive display status from session store and WebSocket state
   // Priority: error > connecting > recording > wsSessionState > currentState
-  const status: 'idle' | 'connecting' | 'listening' | 'speaking' | 'error' = 
+  const status: 'idle' | 'connecting' | 'listening' | 'speaking' | 'error' =
     error ? 'error' :
-    isConnecting ? 'connecting' :
-    isRecording ? 'listening' :
-    wsSessionState === 'PROCESSING' ? 'listening' : // Show as listening during processing for UX
-    wsSessionState === 'SPEAKING' ? 'speaking' :
-    currentState === 'SPEAKING' ? 'speaking' :
-    currentState === 'LISTENING' || currentState === 'PROCESSING' ? 'listening' :
-    'idle';
+      isConnecting ? 'connecting' :
+        isRecording ? 'listening' :
+          wsSessionState === 'PROCESSING' ? 'listening' : // Show as listening during processing for UX
+            wsSessionState === 'SPEAKING' ? 'speaking' :
+              currentState === 'SPEAKING' ? 'speaking' :
+                currentState === 'LISTENING' || currentState === 'PROCESSING' ? 'listening' :
+                  'idle';
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -116,7 +116,6 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       const ws = new WebSocket('ws://localhost:8000/agent/stream');
 
       ws.onopen = () => {
-        console.log('Agent WebSocket connected');
         wsRef.current = ws;
         setIsConnecting(false);
       };
@@ -124,7 +123,6 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       ws.onmessage = async (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log("WS Data Payload:", data.type, data.text ? data.text : (data.data ? `[data array size: ${data.data.length}]` : ""));
 
           if (data.type === 'ready') {
             startMediaRecording(ws);
@@ -184,7 +182,6 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       };
 
       ws.onclose = () => {
-        console.log('Agent WS closed');
         wsRef.current = null;
         setWsSessionState('IDLE');
         if (isRecording) stopInteraction();
@@ -361,27 +358,27 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
       <div className="relative group">
         {/* Outer Glow Layer */}
         <div className={`absolute -inset-4 rounded-full blur-2xl transition-opacity duration-1000 ${status === 'listening' ? 'bg-secondary/30 opacity-100' :
-            status === 'speaking' ? 'bg-accent/20 opacity-100' : 'opacity-0'
+          status === 'speaking' ? 'bg-accent/20 opacity-100' : 'opacity-0'
           }`}></div>
 
         <button
           className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer isolation-auto z-10 
             ${status === 'listening' ? 'bg-secondary ring-4 ring-secondary/30 shadow-[0_0_50px_rgba(139,92,246,0.6)] scale-110' :
               status === 'speaking' ? 'bg-accent shadow-[0_0_40px_rgba(16,185,129,0.5)] animate-pulse' :
-              status === 'error' ? 'bg-error shadow-[0_0_30px_rgba(239,68,68,0.5)]' :
-              'bg-surface border-2 border-border hover:border-primary/50 hover:shadow-neon'}
+                status === 'error' ? 'bg-error shadow-[0_0_30px_rgba(239,68,68,0.5)]' :
+                  'bg-surface border-2 border-border hover:border-primary/50 hover:shadow-neon'}
             ${isProcessing || status === 'connecting' ? 'opacity-50 cursor-wait' : ''}
             ${hotkeyActivated ? 'ring-4 ring-primary/50 scale-110' : ''}
           `}
           onClick={toggleRecording}
-        disabled={isProcessing || status === 'connecting'}
+          disabled={isProcessing || status === 'connecting'}
         >
-        {/* Hotkey activation flash */}
-        {hotkeyActivated && (
-          <div className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />
-        )}
-        
-        {/* Animated Spectral Rings for Listening */}
+          {/* Hotkey activation flash */}
+          {hotkeyActivated && (
+            <div className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />
+          )}
+
+          {/* Animated Spectral Rings for Listening */}
           {status === 'listening' && (
             <div className="absolute inset-0 z-0">
               {[...Array(3)].map((_, i) => (
@@ -442,7 +439,7 @@ export function VoiceButton({ onTranscript, isProcessing = false }: VoiceButtonP
         <span className={`text-sm font-mono tracking-widest uppercase ${getStateLabelClass()}`}>
           {getStateLabel()}
         </span>
-        
+
         {/* Continuous mode indicator */}
         {isContinuousMode && status !== 'idle' && !error && (
           <span className="text-xs text-text-secondary mt-1 opacity-50">

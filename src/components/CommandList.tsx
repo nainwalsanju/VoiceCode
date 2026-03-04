@@ -44,7 +44,7 @@ export function CommandList({ onSelect, selectedId, onRefresh }: CommandListProp
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!confirm('Are you sure you want to delete this command?')) return;
-    
+
     try {
       await commandsApi.delete(id);
       await loadCommands();
@@ -99,29 +99,43 @@ export function CommandList({ onSelect, selectedId, onRefresh }: CommandListProp
   }
 
   return (
-    <div className="command-list">
+    <div className="flex flex-col gap-3">
       {commands.map((command) => (
         <div
           key={command.id}
-          className={`command-item ${selectedId === command.id ? 'selected' : ''} ${!command.is_active ? 'inactive' : ''}`}
+          className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border transition-all duration-300 group cursor-pointer ${selectedId === command.id
+              ? 'bg-primary/10 border-primary/50 shadow-neon'
+              : 'bg-surface/60 border-border hover:border-text-secondary/30 hover:bg-surface/80'
+            } ${!command.is_active ? 'opacity-60 saturate-50' : ''}`}
           onClick={() => onSelect?.(command)}
         >
-          <div className="command-info">
-            <span className="command-trigger">{command.trigger}</span>
-            <span className="command-type">{getActionTypeLabel(command.action_type)}</span>
-            {command.is_regex && <span className="command-badge">Regex</span>}
-            {command.description && <span className="command-description">{command.description}</span>}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <span className="text-text-primary font-mono font-bold text-sm tracking-wider">{command.trigger}</span>
+              <span className="text-[9px] font-mono text-text-secondary uppercase px-2 py-0.5 rounded-md bg-background border border-border/80">
+                {getActionTypeLabel(command.action_type)}
+              </span>
+              {command.is_regex && (
+                <span className="text-[9px] font-mono font-bold text-secondary uppercase px-2 py-0.5 rounded-md bg-secondary/10 border border-secondary/20">
+                  Regex
+                </span>
+              )}
+            </div>
+            {command.description && <span className="text-[11px] font-mono text-text-secondary/60">{command.description}</span>}
           </div>
-          <div className="command-actions">
+          <div className="flex items-center gap-3 mt-4 sm:mt-0">
             <button
-              className={`btn-toggle ${command.is_active ? 'active' : ''}`}
+              className={`px-4 py-2 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer border ${command.is_active
+                ? 'bg-accent/10 text-accent border-accent/20 hover:bg-accent/20'
+                : 'bg-surface text-text-secondary border-border hover:bg-surface/80'
+                }`}
               onClick={(e) => handleToggle(command.id, e)}
               title={command.is_active ? 'Disable command' : 'Enable command'}
             >
               {command.is_active ? 'Active' : 'Inactive'}
             </button>
             <button
-              className="btn-delete"
+              className="px-4 py-2 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest bg-error/10 text-error border border-error/20 hover:bg-error/20 transition-all cursor-pointer"
               onClick={(e) => handleDelete(command.id, e)}
             >
               Delete

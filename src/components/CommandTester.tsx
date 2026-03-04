@@ -24,7 +24,7 @@ export function CommandTester() {
       setResult({
         matched: false,
         success: false,
-        error: err instanceof Error ? err.message : 'Test failed',
+        error: err instanceof Error ? err.message : 'Datalink failure: Test aborted',
       });
     } finally {
       setTesting(false);
@@ -38,57 +38,107 @@ export function CommandTester() {
   };
 
   return (
-    <div className="command-tester">
-      <h3>Command Tester</h3>
-      <p className="tester-description">
-        Enter text to test which command would be triggered
-      </p>
+    <div className="bg-surface/30 backdrop-blur-md border border-border rounded-xl p-6 shadow-xl relative overflow-hidden group">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-all duration-700"></div>
 
-      <div className="tester-input">
-        <textarea
-          value={testInput}
-          onChange={(e) => setTestInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Enter text to test (e.g., 'insert signature')"
-          rows={3}
-        />
-        <button onClick={handleTest} disabled={testing || !testInput.trim()}>
-          {testing ? 'Testing...' : 'Test Command'}
+      <div className="relative flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-sm font-mono font-bold text-text-primary uppercase tracking-[0.2em]">Protocol_Scanner</h3>
+          <p className="text-[10px] font-mono text-text-secondary uppercase mt-1 opacity-50">
+            Verify neural command mapping
+          </p>
+        </div>
+        <div className="flex gap-1">
+          <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
+          <div className="w-1 h-1 rounded-full bg-primary animate-pulse delay-75"></div>
+          <div className="w-1 h-1 rounded-full bg-primary animate-pulse delay-150"></div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <div className="relative">
+          <textarea
+            value={testInput}
+            onChange={(e) => setTestInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Input_Stream [e.g. 'execute signature_injection']"
+            rows={3}
+            className="w-full bg-background/50 border border-border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all text-text-primary placeholder:text-text-secondary/20 resize-none shadow-inner custom-scrollbar"
+          />
+          <div className="absolute bottom-3 right-3 text-[8px] font-mono text-text-secondary opacity-30 pointer-events-none">
+            CTRL + ENTER_TO_COMMIT
+          </div>
+        </div>
+
+        <button
+          onClick={handleTest}
+          disabled={testing || !testInput.trim()}
+          className="w-full py-3 px-6 rounded-xl font-mono font-bold text-[10px] uppercase tracking-[0.2em] transition-all focus:outline-none focus:ring-2 focus:ring-primary/50
+            bg-primary text-white shadow-neon hover:bg-primary/90 
+            disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+        >
+          {testing ? 'Analyzing...' : 'Initialize_Scan'}
         </button>
       </div>
 
       {result && (
-        <div className={`tester-result ${result.matched ? 'matched' : 'no-match'}`}>
+        <div className={`mt-6 p-5 border rounded-xl transition-all duration-500 animate-in fade-in slide-in-from-top-2
+          ${result.matched
+            ? 'bg-primary/5 border-primary/20 shadow-sm'
+            : 'bg-error/5 border-error/20'}`}
+        >
           {result.matched ? (
-            <>
-              <div className="result-header">
-                <span className="result-label">Matched Command:</span>
-                <span className="result-trigger">{result.trigger}</span>
-                <span className="result-type">{result.action_type}</span>
-              </div>
-              <div className="result-status">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+                  <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest">Match_Found</span>
+                </div>
                 {result.success ? (
-                  <span className="status-success">Success</span>
+                  <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest px-2 py-0.5 bg-accent/10 rounded border border-accent/20">Executed</span>
                 ) : (
-                  <span className="status-error">Failed</span>
+                  <span className="text-[10px] font-mono font-bold text-error uppercase tracking-widest px-2 py-0.5 bg-error/10 rounded border border-error/20">Fault</span>
                 )}
               </div>
-              {result.output && (
-                <div className="result-output">
-                  <pre>{JSON.stringify(result.output, null, 2)}</pre>
+
+              <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Trigger</span>
+                  <span className="text-xs font-mono font-bold text-text-primary tracking-tight">{result.trigger}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50">Action_Type</span>
+                  <span className="text-xs font-mono font-bold text-text-primary tracking-tight uppercase">{result.action_type || 'Unknown'}</span>
+                </div>
+              </div>
+
+              {!!result.output && (
+                <div className="mt-2">
+                  <span className="text-[8px] font-mono text-text-secondary uppercase opacity-50 mb-1 block">Output_Payload</span>
+                  <div className="bg-background/80 rounded-lg p-3 border border-border">
+                    <pre className="text-[10px] font-mono text-primary/80 overflow-x-auto custom-scrollbar">
+                      {JSON.stringify(result.output, null, 2)}
+                    </pre>
+                  </div>
                 </div>
               )}
+
               {result.error && (
-                <div className="result-error">
-                  <pre>{result.error}</pre>
+                <div className="mt-2 text-error font-mono text-[9px] uppercase tracking-tight flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-error"></span>
+                  ERROR: {result.error}
                 </div>
               )}
-            </>
+            </div>
           ) : (
-            <div className="no-match-result">
-              <span className="no-match-label">No matching command found</span>
-              <span className="no-match-hint">
-                Try creating a command with this trigger phrase
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-error/10 flex items-center justify-center mb-1">
+                <span className="text-error text-lg">!</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-[0.1em]">Null_Reference</span>
+              <span className="text-[9px] font-mono text-text-secondary uppercase opacity-50">
+                Input stream does not match active protocols
               </span>
             </div>
           )}

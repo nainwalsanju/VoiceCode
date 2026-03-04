@@ -1,19 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #6366F1;
-  --color-secondary: #8B5CF6;
-  --color-accent: #10B981;
-  --color-background: #0F172A;
-  --color-surface: #1E293B;
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
+  /* Color Variables - Themed via CSS vars */
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border: var(--border-color);
+
   --color-error: #EF4444;
-  --color-success: #22C55E;
+  --color-success: #10B981;
   --color-warning: #F59E0B;
-  
-  --font-sans: Inter, system-ui, sans-serif;
+
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-mesh: mesh 20s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes mesh {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+
+    33% {
+      transform: scale(1.2) translate(5%, 5%);
+    }
+
+    66% {
+      transform: scale(1.1) translate(-5%, 2%);
+    }
+
+    100% {
+      transform: scale(1) translate(0, 0);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
+
+:root {
+  /* Dark Mode (Default) - Vibrant Block-based Developer Tool */
+  --primary: #3B82F6;
+  /* Blue 500 - Friendlier Primary */
+  --secondary: #8B5CF6;
+  /* Violet 500 - Playful Secondary */
+  --accent: #22C55E;
+  /* Emerald 500 - Run Green CTA */
+  --background: #0F172A;
+  /* Slate 900 */
+  --surface: #1E293B;
+  /* Slate 800 - More solid surface */
+  --text-primary: #F8FAFC;
+  /* Slate 50 */
+  --text-secondary: #94A3B8;
+  /* Slate 400 */
+  --border-color: rgba(51, 65, 85, 0.8);
+  /* More solid border */
+  --glass-bg: rgba(30, 41, 59, 0.95);
+  /* Less glossy, more blocky */
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --shadow-neon: 0 4px 6px rgba(59, 130, 246, 0.4);
+}
+
+.light {
+  /* Light Mode - Frosty Glass */
+  --primary: #2563EB;
+  /* Blue 600 */
+  --secondary: #7C3AED;
+  /* Violet 600 */
+  --accent: #16A34A;
+  /* Green 600 */
+  --background: #F8FAFC;
+  /* Slate 50 */
+  --surface: #FFFFFF;
+  /* White */
+  --text-primary: #0F172A;
+  /* Slate 900 */
+  --text-secondary: #475569;
+  /* Slate 600 */
+  --border-color: rgba(226, 232, 240, 0.9);
+  /* Slate 200 */
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --shadow-neon: 0 4px 6px rgba(37, 99, 235, 0.2);
 }
 
 body {
@@ -22,4 +107,36 @@ body {
   color: var(--color-text-primary);
   margin: 0;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.neo-blur {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }

@@ -43,7 +43,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
   const handleSave = async (key: string, value: unknown) => {
     if (!settings) return;
-    
+
     try {
       // Unregister old hotkey before changing it
       if (key === 'hotkey' && settings.hotkey) {
@@ -97,7 +97,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   useEffect(() => {
     if (settings && settings.hotkey) {
       const handleVoiceActivation = () => {
-        console.log('Voice activation hotkey triggered');
+        // Voice activation hotkey triggered
       };
       registerGlobalHotkey(settings.hotkey, handleVoiceActivation);
     }
@@ -304,11 +304,11 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                       Manual_activation_hotkey
                     </label>
                     <div className="relative group">
-          <input
-            type="text"
-            value={settings.hotkey}
-            onChange={(e) => handleSave('hotkey', normalizeHotkey(e.target.value))}
-            placeholder="CTRL+SHIFT+V"
+                      <input
+                        type="text"
+                        value={settings.hotkey}
+                        onChange={(e) => handleSave('hotkey', normalizeHotkey(e.target.value))}
+                        placeholder="CTRL+SHIFT+V"
                         className="w-full px-5 py-4 rounded-xl bg-background/50 border border-border text-text-primary font-mono text-sm focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all placeholder:opacity-20 shadow-inner group-hover:border-accent/30"
                       />
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1">

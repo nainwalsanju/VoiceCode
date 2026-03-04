@@ -116,3 +116,17 @@ None - no external service configuration required.
 ---
 *Phase: 03-conversation-flow-voice-features*
 *Completed: 2026-03-03*
+
+## Self-Check: PASSED
+
+All required files created:
+- ✅ 03-03-SUMMARY.md exists
+- ✅ STATE.md updated
+- ✅ ROADMAP.md updated
+- ✅ REQUIREMENTS.md updated
+
+All commits present:
+- ✅ feat(03-03): add hotkey activation logic to VoiceButton (310d94f)
+- ✅ feat(03-03): add hotkey re-registration on settings change (a1c56b3)
+- ✅ feat(03-03): add global-shortcut permissions to Tauri capabilities (bbe6fee)
+- ✅ docs(03-03): complete global hotkey activation plan (873b695)

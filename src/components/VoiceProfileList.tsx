@@ -30,13 +30,13 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this voice profile?')) return;
-    
+    if (!confirm('Are you sure you want to deauthorize this neural profile?')) return;
+
     try {
       await voiceProfilesApi.delete(id);
       await loadProfiles();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete profile');
+      alert(err instanceof Error ? err.message : 'Datalink failure: Could not delete');
     }
   };
 
@@ -45,28 +45,31 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
       await voiceProfilesApi.update(id, { is_default: true });
       await loadProfiles();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to set default');
+      alert(err instanceof Error ? err.message : 'Datalink failure: Could not update');
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
-        <span className="ml-3 text-text-secondary">Loading voice profiles...</span>
+      <div className="flex flex-col items-center justify-center py-12 gap-3">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full shadow-neon"></div>
+        <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-text-secondary uppercase animate-pulse">Scanning Neural Banks...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-error/20 border border-error rounded-lg p-4">
-        <p className="text-error text-sm mb-3">{error}</p>
+      <div className="bg-error/10 border border-error/20 rounded-xl p-6 transition-all animate-in fade-in duration-500">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-2 h-2 rounded-full bg-error animate-ping"></div>
+          <p className="text-error font-mono text-xs font-bold uppercase tracking-tight">System Error: {error}</p>
+        </div>
         <button
           onClick={loadProfiles}
-          className="px-4 py-2 bg-error text-white rounded-lg hover:opacity-90 transition-opacity"
+          className="w-full py-2.5 bg-error/20 text-error hover:bg-error/30 border border-error/30 rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
         >
-          Retry
+          Re-establish Link
         </button>
       </div>
     );
@@ -74,47 +77,62 @@ export function VoiceProfileList({ onSelect, selectedId }: VoiceProfileListProps
 
   if (profiles.length === 0) {
     return (
-      <div className="text-center py-12 text-text-secondary">
-        <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+      <div className="text-center py-12 text-text-secondary animate-in fade-in duration-700">
+        <svg className="w-12 h-12 mx-auto mb-4 opacity-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
         </svg>
-        <p>No voice profiles yet. Clone a voice to get started!</p>
+        <p className="text-sm font-mono opacity-40 uppercase tracking-widest">No Active Neural Profiles</p>
+        <p className="text-[10px] mt-2 opacity-30 font-mono">Initialization required</p>
       </div>
     );
   }
 
   return (
-    <div className="voice-profile-list">
+    <div className="space-y-3">
       {profiles.map((profile) => (
         <div
           key={profile.id}
-          className={`voice-profile-item ${selectedId === profile.id ? 'selected' : ''} ${profile.is_default ? 'default' : ''}`}
           onClick={() => onSelect?.(profile)}
+          className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all duration-300 group cursor-pointer
+            ${selectedId === profile.id
+              ? 'bg-primary/10 border-primary/50 shadow-neon'
+              : 'bg-surface/30 border-border hover:border-text-secondary/30 hover:bg-surface/50'}
+          `}
         >
-          <div className="voice-profile-info">
-            <span className="voice-profile-name">{profile.name}</span>
-            {profile.is_default && <span className="voice-profile-badge">Default</span>}
+          <div className="flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+              ${profile.is_default ? 'bg-accent/20 text-accent' : 'bg-surface border border-border text-text-secondary group-hover:text-text-primary'}
+            `}>
+              <span className="font-mono font-bold text-xs uppercase">{profile.name.substring(0, 2)}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-text-primary tracking-tight group-hover:text-primary transition-colors">{profile.name}</span>
+              {profile.is_default && (
+                <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-[0.2em] mt-0.5">Primary_Link</span>
+              )}
+            </div>
           </div>
-          <div className="voice-profile-actions">
+
+          <div className="flex items-center gap-2 mt-4 sm:mt-0 opacity-0 group-hover:opacity-100 transition-opacity">
             {!profile.is_default && (
               <button
-                className="btn-set-default"
+                className="px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 transition-all cursor-pointer border border-primary/20"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSetDefault(profile.id);
                 }}
               >
-                Set Default
+                Sync
               </button>
             )}
             <button
-              className="btn-delete"
+              className="px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest bg-error/10 text-error/70 hover:text-error hover:bg-error/20 transition-all cursor-pointer border border-error/20"
               onClick={(e) => {
                 e.stopPropagation();
                 handleDelete(profile.id);
               }}
             >
-              Delete
+              Purge
             </button>
           </div>
         </div>

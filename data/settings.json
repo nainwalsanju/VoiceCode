@@ -1,6 +1,6 @@
 {
-  "stt_provider": "whisper",
-  "tts_voice": "en-US-Neural2-F",
+  "stt_provider": "google",
+  "tts_voice": "en-US-Neural2-M",
   "tts_speed": 1,
   "tts_pitch": 1.0,
   "microphone": "",
@@ -10,6 +10,6 @@
   "minimize_to_tray": true,
   "always_on_top": false,
   "language": "en-US",
-  "silence_threshold": 0.5,
+  "silence_threshold": 0.6,
   "max_recording_duration": 30
 }

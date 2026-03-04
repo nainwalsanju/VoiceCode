@@ -56,7 +56,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
       try {
         parsedActionData = JSON.parse(actionData);
       } catch {
-        setError('Invalid JSON in action data');
+        setError('Syntax Error: Invalid JSON detected in action_data');
         setSaving(false);
         return;
       }
@@ -80,7 +80,7 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
 
       onSave?.(savedCommand);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save command');
+      setError(err instanceof Error ? err.message : 'Uplink fail: Could not transmit command');
     } finally {
       setSaving(false);
     }
@@ -97,80 +97,126 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
   };
 
   return (
-    <form className="command-form" onSubmit={handleSubmit}>
-      <h3>{command ? 'Edit Command' : 'Create Command'}</h3>
+    <form className="space-y-6" onSubmit={handleSubmit}>
+      {error && (
+        <div className="bg-error/10 border border-error/20 text-error p-4 rounded-xl text-[10px] font-mono font-bold uppercase tracking-tight flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
+          <span className="w-1.5 h-1.5 rounded-full bg-error animate-ping shrink-0"></span>
+          {error}
+        </div>
+      )}
 
-      {error && <div className="form-error">{error}</div>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-2.5">
+          <label htmlFor="trigger" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em] pl-1 opacity-60">
+            Trigger_Pattern_Identity
+          </label>
+          <div className="relative group/input">
+            <input
+              id="trigger"
+              type="text"
+              value={trigger}
+              onChange={(e) => setTrigger(e.target.value)}
+              placeholder="e.g. initialize_systems"
+              required
+              className="w-full bg-background/80 border border-border/80 rounded-xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-text-primary placeholder:text-text-secondary/40 font-mono shadow-sm group-hover/input:border-primary/40"
+            />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono text-primary opacity-0 group-focus-within/input:opacity-100 transition-opacity">_LISTEN</div>
+          </div>
+        </div>
 
-      <div className="form-group">
-        <label htmlFor="trigger">Trigger Phrase</label>
-        <input
-          id="trigger"
-          type="text"
-          value={trigger}
-          onChange={(e) => setTrigger(e.target.value)}
-          placeholder="e.g., insert signature"
-          required
-        />
-        <small>The phrase that activates this command</small>
+        <div className="flex flex-col gap-2.5">
+          <label htmlFor="actionType" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em] pl-1 opacity-60">
+            Execution_Protocol_Type
+          </label>
+          <div className="relative group/input">
+            <select
+              id="actionType"
+              value={actionType}
+              onChange={(e) => {
+                setActionType(e.target.value as ActionType);
+                setActionData(getActionDataPlaceholder());
+              }}
+              className="w-full bg-background/80 border border-border/80 rounded-xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-text-primary font-mono shadow-sm cursor-pointer appearance-none group-hover/input:border-primary/40"
+            >
+              {ACTION_TYPES.map((type) => (
+                <option key={type.value} value={type.value} className="bg-slate-900 text-text-primary">
+                  {type.label.toUpperCase().replace(' ', '_')}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-focus-within/input:text-primary transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" strokeWidth={2} /></svg>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="description">Description</label>
+      <div className="flex flex-col gap-2">
+        <label htmlFor="description" className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+          Protocol_Description
+        </label>
         <input
           id="description"
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="What this command does"
+          placeholder="// Optional metadata for this instruction"
+          className="w-full bg-surface/80 border border-border rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-text-primary placeholder:text-text-secondary/40 font-mono shadow-sm"
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="actionType">Action Type</label>
-        <select
-          id="actionType"
-          value={actionType}
-          onChange={(e) => {
-            setActionType(e.target.value as ActionType);
-            setActionData(getActionDataPlaceholder());
-          }}
-        >
-          {ACTION_TYPES.map((type) => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="actionData">Action Data (JSON)</label>
-        <textarea
-          id="actionData"
-          value={actionData}
-          onChange={(e) => setActionData(e.target.value)}
-          placeholder={getActionDataPlaceholder()}
-          rows={6}
-          required
-        />
-        <small>JSON configuration for the action</small>
-      </div>
-
-      <div className="form-row">
-        <div className="form-group checkbox">
-          <label>
-            <input
-              type="checkbox"
-              checked={isRegex}
-              onChange={(e) => setIsRegex(e.target.checked)}
-            />
-            Regular Expression
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center justify-between px-1">
+          <label htmlFor="actionData" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em] opacity-60">
+            Internal_Payload_Logic
           </label>
+          <span className="text-[8px] font-mono text-primary/40 font-bold uppercase tracking-tighter">Enc: UTF-8 // Type: JSON</span>
         </div>
+        <div className="relative">
+          <textarea
+            id="actionData"
+            value={actionData}
+            onChange={(e) => setActionData(e.target.value)}
+            placeholder={getActionDataPlaceholder()}
+            rows={8}
+            required
+            className="w-full bg-background/80 border border-border/80 rounded-xl px-6 py-5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 transition-all text-text-primary placeholder:text-text-secondary/40 resize-none shadow-sm custom-scrollbar"
+          />
+          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background/20 to-transparent pointer-events-none"></div>
+        </div>
+      </div>
 
-        <div className="form-group">
-          <label htmlFor="priority">Priority</label>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <label className="flex items-center gap-3 p-4 rounded-xl bg-surface/60 border border-border hover:border-secondary/50 transition-all cursor-pointer shadow-sm group">
+          <input
+            type="checkbox"
+            checked={isRegex}
+            onChange={(e) => setIsRegex(e.target.checked)}
+            className="w-4 h-4 rounded border-border bg-surface text-secondary focus:ring-secondary/50 focus:ring-offset-background"
+          />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-secondary transition-colors">Regex</span>
+            <span className="text-[8px] font-mono text-text-secondary uppercase">Pattern_Match</span>
+          </div>
+        </label>
+
+        <label className="flex items-center gap-3 p-4 rounded-xl bg-surface/60 border border-border hover:border-accent/50 transition-all cursor-pointer shadow-sm group">
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+            className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent/50 focus:ring-offset-background"
+          />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-tight group-hover:text-accent transition-colors">Active</span>
+            <span className="text-[8px] font-mono text-text-secondary uppercase">Status_Link</span>
+          </div>
+        </label>
+
+        <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-surface/60 border border-border shadow-sm">
+          <label htmlFor="priority" className="text-[9px] font-mono font-bold text-text-secondary uppercase tracking-widest pl-1">
+            Priority_Level
+          </label>
           <input
             id="priority"
             type="number"
@@ -178,31 +224,28 @@ export function CommandForm({ command, onSave, onCancel }: CommandFormProps) {
             onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
             min={0}
             max={100}
+            className="bg-transparent border-none text-sm focus:outline-none font-mono text-text-primary p-0 h-6"
           />
-          <small>Higher priority commands match first</small>
         </div>
       </div>
 
-      <div className="form-group checkbox">
-        <label>
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
-          />
-          Active
-        </label>
-      </div>
-
-      <div className="form-actions">
-        <button type="submit" disabled={saving}>
-          {saving ? 'Saving...' : command ? 'Update Command' : 'Create Command'}
-        </button>
+      <div className="flex items-center gap-4 pt-6 border-t border-border mt-4">
         {onCancel && (
-          <button type="button" className="btn-secondary" onClick={onCancel}>
-            Cancel
+          <button
+            type="button"
+            className="flex-1 py-4 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-[0.2em] bg-surface/80 text-text-secondary border border-border hover:bg-surface hover:text-text-primary transition-all cursor-pointer shadow-sm"
+            onClick={onCancel}
+          >
+            Abort
           </button>
         )}
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex-1 py-4 px-4 rounded-xl font-bold font-mono text-[10px] uppercase tracking-[0.2em] bg-primary text-white shadow-neon hover:bg-primary/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+        >
+          {saving ? 'Transmitting...' : command ? 'Update_Logic' : 'Commit_Protocol'}
+        </button>
       </div>
     </form>
   );
