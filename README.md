@@ -102,15 +102,20 @@ http://localhost:1420
 ## Building for Production
 
 ```bash
-# Build frontend
-npm run build
-
-# Build Tauri app
-cd src-tauri
-cargo build --release
+# Build standalone Tauri app
+npm run tauri build
 ```
 
-The app will be at `src-tauri/target/release/bundle/macos/voicecode.app`
+The compiled installers will be located in `src-tauri/target/release/bundle/`.
+
+> **Note:** VoiceCode relies on the Python backend for heavy STT/TTS processing. The production app must run concurrently with the local backend server.
+
+```bash
+# Start backend server for production app
+source venv/bin/activate  # Windows: venv\Scripts\activate
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
 
 ## Project Structure
 
